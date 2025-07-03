@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  Notion
 //
-//  Created by Admin on 02.07.2025.
+//  Created by Roman on 02.07.2025.
 //
 
 import SwiftUI
