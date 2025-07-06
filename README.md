@@ -21,13 +21,14 @@ In ProjectsTableView, the user can add new columns.
 In TaskCardView, the user can add new cards for a specific status.
 This gives the user flexibility to expand the content directly from the UI.
 
-https://github.com/RomanDutk0/Notion/blob/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-05%20%D0%BE%2002.46.11.png
+Screenshot 1: https://github.com/RomanDutk0/Notion/raw/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-05%20%D0%BE%2002.46.11.png
 
-https://github.com/RomanDutk0/Notion/blob/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.17.04.png
+Screenshot 2: https://github.com/RomanDutk0/Notion/raw/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.17.04.png
 
-https://github.com/RomanDutk0/Notion/blob/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.17.37.png
+Screenshot 3: https://github.com/RomanDutk0/Notion/raw/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.17.37.png
 
-https://github.com/RomanDutk0/Notion/blob/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.18.05.png
+Screenshot 4: https://github.com/RomanDutk0/Notion/raw/main/%D0%97%D0%BD%D1%96%D0%BC%D0%BE%D0%BA%20%D0%B5%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-07-06%20%D0%BE%2022.18.05.png
+
 
 
 
