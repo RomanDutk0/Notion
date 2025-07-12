@@ -11,7 +11,7 @@ import SwiftUI
 struct NotionApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ProjectsListView()
         }
     }
 }

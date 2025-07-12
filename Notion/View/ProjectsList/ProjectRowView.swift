@@ -7,29 +7,53 @@
 
 import SwiftUI
 
-struct ProjectRow : View {
-    let title: String
-    let icon: String
-    let color: Color
-    
+
+struct ProjectRow: View {
+    var project: Project
+
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundColor(color)
-            Text(title)
-                .foregroundColor(.black)
-            Spacer()
-            Image(systemName: "plus")
-                .foregroundColor(.gray)
+        NavigationLink(destination: TaskTreckerView(tasks: project.taskCards, fields: project.getAllFields())) {
+            HStack {
+                Text(project.icon)
+                Text(project.projectName)
+                    .foregroundColor(.black)
+                Spacer()
+                Image(systemName: "pencil")
+                    .foregroundColor(.gray)
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: Color.gray.opacity(0.1), radius: 2, x: 0, y: 1)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: Color.gray.opacity(0.1), radius: 2, x: 0, y: 1)
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
-#Preview {
-    ProjectRow(title: "Projects", icon: "arrow.2.circlepath", color: .blue)
-}
 
+#Preview {
+    NavigationStack {
+        ProjectRow(
+            project: Project(
+                icon: "📝",
+                projectName: "Notion",
+                taskCards: [
+                    Task(fieldValues: [
+                        FieldValue(
+                            field: Field(name: "Name", type: .text),
+                            value: .text("🚀 Product Launch")
+                        ),
+                        FieldValue(
+                            field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                            value: .selection("In Progress")
+                        ),
+                        FieldValue(
+                            field: Field(name: "End Date", type: .date),
+                            value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                        )
+                    ])
+                ]
+            )
+        )
+    }
+}

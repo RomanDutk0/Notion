@@ -1,71 +1,74 @@
-//
-//  RowView.swift
-//  Notion
-//
-//  Created by Roman on 05.07.2025.
-//
-
 import SwiftUI
 
-struct Column: Identifiable, Hashable {
-    let id = UUID()
-    var title: String
-    var width: CGFloat
-}
-
-
 struct RowView: View {
-    var project: Project
-    var columns: [Column]
+    var task: Task
+    var fields: [Field]
 
+    @State private var showDetail = false
+    
     var body: some View {
-        HStack {
-            ForEach(columns) { column in
-                cellContent(for: column)
-                    .frame(width: column.width, alignment: .leading)
+        Button{
+            showDetail = true
+        }label : {
+            HStack {
+                ForEach(fields) { field in
+                    cellContent(for: field)
+                        .frame(width: 120, alignment: .leading)
+                }
             }
-            Spacer()
+            .font(.title3)
+            .frame(height: 60)
+            .padding(.horizontal, 24)
+            
+        }.foregroundColor(.black)
+        .sheet(isPresented: $showDetail) {
+            TaskConstructorView(task: task)
         }
-        .padding(.horizontal)
     }
+        
 
     @ViewBuilder
-    private func cellContent(for column: Column) -> some View {
-        switch column.title {
-        case "Project name":
-            Text("\(project.emoji) \(project.name)")
-        case "Status":
-            Text(project.status)
-                .foregroundColor(.white)
-                .padding(4)
-                //.background(project.status)
-                .cornerRadius(4)
-        case "End date":
-            Text("N/A") // Поки немає дати — заглушка
-        case "Priority":
-            Text("N/A")
-        case "Start date":
-            Text("N/A")
-        default:
+    private func cellContent(for field: Field) -> some View {
+        if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
+            Text(stringValue(for: fieldValue.value))
+        } else {
             Text("-")
         }
     }
+
+    private func stringValue(for value: FieldDataValue) -> String {
+        switch value {
+        case .text(let str): return str
+        case .number(let num): return String(num)
+        case .boolean(let bool): return bool ? "✅" : "❌"
+        case .date(let date): return dateFormatter.string(from: date)
+        case .url(let urlStr): return urlStr
+        case .selection(let selection): return selection
+        }
+    }
+
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter
+    }
 }
+
 #Preview {
     RowView(
-        project: Project(
-            emoji: "🚀",
-            name: "Product Launch",
-            status:  "dhrte",
-            owner: "Ben",
-            avatar: "person.crop.circle"
-        ),
-        columns: [
-            Column(title: "Project name", width: 200),
-            Column(title: "Status", width: 120),
-            Column(title: "End date", width: 120),
-            Column(title: "Priority", width: 120),
-            Column(title: "Start date", width: 120)
+        task: Task(fieldValues: [
+            FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
+            FieldValue(field: Field(name: "Status", type: .selection), value: .selection("In Progress")),
+            FieldValue(field: Field(name: "End date", type: .date), value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))),
+            FieldValue(field: Field(name: "Priority", type: .selection), value: .selection("High")),
+            FieldValue(field: Field(name: "Start date", type: .date), value: .date(Date()))
+        ]),
+        fields: [
+            Field(name: "Name", type: .text),
+            Field(name: "Status", type: .selection),
+            Field(name: "End date", type: .date),
+            Field(name: "Priority", type: .selection),
+            Field(name: "Start date", type: .date)
         ]
     )
 }

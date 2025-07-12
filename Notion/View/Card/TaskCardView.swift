@@ -1,14 +1,10 @@
-//
-//  TaskCardView.swift
-//  Notion
-//
-//  Created by Roman on 03.07.2025.
-//
 import SwiftUI
 
 struct TaskCardView: View {
     var cardStatus: String = ""
-    var projects: [Project] = []
+    
+    @State var tasks: [Task]
+    var fields: [Field]
 
     var body: some View {
         VStack {
@@ -26,7 +22,7 @@ struct TaskCardView: View {
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(6)
 
-                Text("\(projects.count)")
+                Text("\(tasks.count)")
                     .opacity(0.5)
 
                 Spacer()
@@ -43,7 +39,7 @@ struct TaskCardView: View {
                 .frame(width: 15, height: 15)
 
                 Button {
-                    print("Add tapped")
+                    addTask()
                 } label: {
                     Image(systemName: "plus")
                         .opacity(0.3)
@@ -56,17 +52,12 @@ struct TaskCardView: View {
             }
             .padding(.horizontal)
 
-            // ⏺ Тепер рендеримо всі проекти у цьому статусі
-            ForEach(projects) { project in
-                CardView( emoji: project.emoji,
-                    mainTitle: project.name,
-                    cardPriority: "Priority", // Якщо є — project.priority
-                    cardTaskType: "TaskType"  // Якщо є — project.taskType
-                )
+            ForEach(tasks) { task in
+                CardView(task: task)
             }
 
             Button {
-                print("New task tapped")
+                addTask()
             } label: {
                 HStack {
                     Image(systemName: "plus")
@@ -89,9 +80,55 @@ struct TaskCardView: View {
                 .fill(Color.gray.opacity(0.1))
         )
     }
+    
+    private func addTask() {
+        let newFieldValues = fields.map { field in
+            FieldValue(field: field, value: defaultValue(for: field.type))
+        }
+        tasks.append(Task(fieldValues: newFieldValues))
+    }
+    
+    private func defaultValue(for type: FieldType) -> FieldDataValue {
+        switch type {
+        case .text: return .text("")
+        case .number: return .number(0)
+        case .boolean: return .boolean(false)
+        case .date: return .date(Date())
+        case .url: return .url("")
+        case .selection: return .selection("")
+        }
+    }
 }
 
 
 #Preview {
-    TaskCardView()
+    TaskCardView(
+        cardStatus: "In Progress",
+        tasks: [
+            Task(fieldValues: [
+                FieldValue(
+                    field: Field(name: "Name", type: .text),
+                    value: .text("🚀 Product Launch")
+                ),
+                FieldValue(
+                    field: Field(name: "Status", type: .selection),
+                    value: .selection("In Progress")
+                )
+            ]),
+            Task(fieldValues: [
+                FieldValue(
+                    field: Field(name: "Name", type: .text),
+                    value: .text("📝 Write Docs")
+                ),
+                FieldValue(
+                    field: Field(name: "Status", type: .selection),
+                    value: .selection("Not Started")
+                )
+            ])
+        ],
+        fields: [
+            Field(name: "Name", type: .text),
+            Field(name: "Status", type: .selection)
+        ]
+    )
 }

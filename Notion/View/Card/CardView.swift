@@ -1,72 +1,21 @@
-//
-//  CardView.swift
-//  Notion
-//
-//  Created by Roman on 03.07.2025.
-//
-
 import SwiftUI
 
 struct CardView: View {
+    var task: Task
     
-    var emoji: String = ""
-    var mainTitle: String = ""
-    var cardPriority: String = ""
-    var cardTaskType: String = ""
+    @State private var showDetail = false
     
     var body: some View {
-        Button{
-            print()
-        }label:{
+        Button {
+            showDetail = true
+        } label: {
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    Button{print()
-                    }label : {
-                        Image(systemName: emoji)
-                            .foregroundColor(.red)
-                    }
-                    Button{
-                        print()
-                    }label :{
-                        Text(mainTitle)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                    }
-                    Spacer()
+                ForEach(task.fieldValues) { fieldValue in
+                    fieldRow(fieldValue)
                 }
-                
-                VStack(alignment: .leading,spacing: 8) {
-                   
-                    Button{
-                        print()
-                    } label : {
-                        Text(cardPriority)
-                            .font(.caption)
-                            .foregroundColor(Color(.black))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.yellow.opacity(0.2))
-                            .cornerRadius(6)
-                    }
-                   
-                    Button {
-                        print()
-                    } label:{
-                        HStack(spacing: 4) {
-                            Image(systemName: "bubble.left")
-                            Text(cardTaskType)
-                                .foregroundColor(Color(.black))
-                        }
-                    }
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.green.opacity(0.2))
-                    .cornerRadius(6)
-                }
-                
+              
             }
-            .frame(width: 235, height: 85)
+            .frame(width: 235)
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 12)
@@ -74,12 +23,59 @@ struct CardView: View {
                     .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
             )
         }
+        .sheet(isPresented: $showDetail) {
+           TaskConstructorView(task: task)
+        }
+    }
+    
+   
+    @ViewBuilder
+    private func fieldRow(_ fieldValue: FieldValue) -> some View {
+        switch fieldValue.value {
+        case .text(let text):
+            labeledRow(fieldValue.field.name, text)
+        case .number(let number):
+            labeledRow(fieldValue.field.name, String(number))
+        case .boolean(let flag):
+            labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
+        case .date(let date):
+            labeledRow(fieldValue.field.name, formatted(date))
+        case .url(let url):
+            labeledRow(fieldValue.field.name, url)
+        case .selection(let option):
+            labeledRow(fieldValue.field.name, option)
+        }
+    }
+    
+    private func labeledRow(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(value)
+                .font(.body)
+                .foregroundColor(.primary)
+            Spacer()
+        }
+    }
+    
+    private func formatted(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
     }
 }
 
 #Preview {
-    CardView(emoji: "📄",
-              mainTitle: "Title",
-              cardPriority: "Priority",
-              cardTaskType: "TaskType")
+    let fields = [
+        Field(name: "Name", type: .text),
+        Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]),
+        Field(name: "Due Date", type: .date)
+    ]
+    
+    let task = Task(fieldValues: [
+        FieldValue(field: fields[0], value: .text("🚀Product Launch")),
+        FieldValue(field: fields[1], value: .selection("High")),
+        FieldValue(field: fields[2], value: .date(Date()))
+    ])
+    
+    return CardView(task: task)
 }
+

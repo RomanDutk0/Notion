@@ -9,15 +9,10 @@ import SwiftUI
 
 struct TaskTreckerView: View {
     
-    let projects: [Project] = [
-        .init(emoji: "📄", name: "Research study", status: "In Progress", owner: "Nina", avatar: "person.crop.circle"),
-        .init(emoji: "📬", name: "Marketing cam", status: "In Progress", owner: "Sam", avatar: "person.crop.circle.fill"),
-        .init(emoji: "🎨", name: "Website redesi", status: "Planning", owner: "Nina", avatar: "person.crop.circle"),
-        .init(emoji: "🚀", name: "Product launch", status: "In Progress", owner: "Ben", avatar: "person.crop.circle.badge.checkmark")
-    ]
-    
-    @State private var selectedFilter = " "
-    @State private var selectedFilterImage  = " "
+    var tasks: [Task]
+    var fields: [Field]
+    @State private var selectedFilter = "By Status"
+    @State private var selectedFilterImage  = "arrow.right"
     
     var body: some View {
         VStack{
@@ -96,9 +91,9 @@ struct TaskTreckerView: View {
                     }
                 }
                 if selectedFilter == "By Status" {
-                    CardBoard(projects: projects)
+                     CardBoard(tasks: tasks , fields: fields)
                 } else {
-                    ProjectsTableView(projects: projects)
+                    ProjectsTableView(fields: fields, tasks:tasks )
                 }
 
             }
@@ -112,5 +107,44 @@ struct TaskTreckerView: View {
 
 
 #Preview {
-    TaskTreckerView()
+    let fields = [
+        Field(name: "Emoji", type: .text),
+        Field(name: "Name", type: .text),
+        Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Completed", "Planning"]),
+        Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low", "Critical"])
+    ]
+    
+    let tasks = [
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("🚀")),
+            FieldValue(field: fields[1], value: .text("Product Launch")),
+            FieldValue(field: fields[2], value: .selection("In Progress")),
+            FieldValue(field: fields[3], value: .selection("High"))
+        ]),
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("📝")),
+            FieldValue(field: fields[1], value: .text("Write Documentation")),
+            FieldValue(field: fields[2], value: .selection("Not Started")),
+            FieldValue(field: fields[3], value: .selection("Medium"))
+        ]),
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("🎨")),
+            FieldValue(field: fields[1], value: .text("Design New Logo")),
+            FieldValue(field: fields[2], value: .selection("Completed")),
+            FieldValue(field: fields[3], value: .selection("Low"))
+        ]),
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("📣")),
+            FieldValue(field: fields[1], value: .text("Marketing Campaign")),
+            FieldValue(field: fields[2], value: .selection("Planning")),
+            FieldValue(field: fields[3], value: .selection("High"))
+        ]),
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("🔍")),
+            FieldValue(field: fields[1], value: .text("QA Testing")),
+            FieldValue(field: fields[2], value: .selection("In Progress")),
+            FieldValue(field: fields[3], value: .selection("Critical"))
+        ])
+    ]
+    TaskTreckerView(tasks: tasks , fields : fields )
 }
