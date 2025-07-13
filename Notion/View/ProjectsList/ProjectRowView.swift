@@ -12,7 +12,7 @@ struct ProjectRow: View {
     var project: Project
 
     var body: some View {
-        NavigationLink(destination: TaskTreckerView(tasks: project.taskCards, fields: project.getAllFields())) {
+        NavigationLink(destination: TaskTreckerView(tasks: project.taskCards, fields:   ProjectViewModel.getAllFields(project))) {
             HStack {
                 Text(project.icon)
                 Text(project.projectName)

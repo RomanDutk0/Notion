@@ -1,8 +1,8 @@
 import SwiftUI
 
-
-
 struct CardConstructorView: View {
+    @Binding var projects: [Project]
+    
     @State private var fields: [Field] = [
         Field(name: "Title", type: .text)
     ]
@@ -49,7 +49,7 @@ struct CardConstructorView: View {
                         .bold()
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.green)
+                        .background(Color.gray)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
@@ -111,7 +111,6 @@ struct CardConstructorView: View {
         let field = Field(name: newFieldName, type: newFieldType, options: options)
         fields.append(field)
         
-        // Скинути стан
         newFieldName = ""
         newFieldOptions = ""
         newFieldType = .text
@@ -119,17 +118,37 @@ struct CardConstructorView: View {
     }
     
     private func saveProject() {
-        // TODO: Зберегти в реальному проєкті
-        print("Saving project with fields:")
-        fields.forEach { print("- \($0.name): \($0.type.rawValue)") }
+        let newTask = Task(fieldValues: fields.map { field in
+            let value: FieldDataValue
+            switch field.type {
+            case .text:
+                value = .text("")
+            case .selection:
+                value = .selection(field.options.first ?? "")
+            case .number:
+                value = .number(0)
+            case .boolean:
+                value = .boolean(false)
+            case .date:
+                value = .date(Date())
+            case .url:
+                value = .text("https://example.com")
+            }
+            return FieldValue(field: field, value: value)
+        })
+        
+        let newProject = Project(icon: "📌", projectName: "New Project", taskCards: [newTask])
+        projects.append(newProject)
+        
+        print("✅ Project added. Total projects: \(projects.count)")
     }
 }
 
-// MARK: - Preview
-
 struct CardConstructorView_Previews: PreviewProvider {
+    @State static var previewProjects: [Project] = []
+
     static var previews: some View {
-        CardConstructorView()
+        CardConstructorView(projects: $previewProjects)
     }
 }
 

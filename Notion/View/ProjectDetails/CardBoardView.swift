@@ -5,18 +5,8 @@ struct CardBoard: View {
     var fields: [Field]
 
    
-    private func status(for task: Task) -> String {
-        if let statusField = task.fieldValues.first(where: { $0.field.name == "Status" }) {
-            if case let .selection(value) = statusField.value {
-                return value
-            }
-        }
-        return "Unknown"
-    }
-
-   
     var tasksByStatus: [String: [Task]] {
-        Dictionary(grouping: tasks, by: { status(for: $0) })
+        Dictionary(grouping: tasks, by: { CardViewModel.status(for: $0) })
     }
 
     var uniqueStatuses: [String] {

@@ -8,20 +8,11 @@
 import Foundation
 
 
-struct Project {
+struct Project : Identifiable {
     let id = UUID()
     var icon: String
     var projectName : String
     var taskCards : [Task]
-    
-    func getAllFields() -> [Field]{
-        var projectFields : [Field] = []
-        
-        for field in self.taskCards[0].fieldValues{
-            projectFields.append(field.field)
-        }
-        return projectFields
-    }
     
 }
 
@@ -35,13 +26,6 @@ struct SubTask: Identifiable {
 struct Task: Identifiable {
     let id = UUID()
     var fieldValues: [FieldValue]
-    
-    static func dateString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
-    }
 }
 
 struct FieldValue: Identifiable {
