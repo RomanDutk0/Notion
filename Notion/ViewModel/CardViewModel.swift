@@ -45,5 +45,8 @@ class CardViewModel : ObservableObject
         return "Unknown"
     }
     
+    static func getField(_ type: FieldType, named: String , _ task : Task) -> FieldDataValue? {
+        return task.fieldValues.first { $0.field.name == named && $0.field.type == type }?.value
+    }
     
 }

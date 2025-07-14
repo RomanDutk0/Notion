@@ -18,8 +18,12 @@ struct ProjectRow: View {
                 Text(project.projectName)
                     .foregroundColor(.black)
                 Spacer()
-                Image(systemName: "pencil")
-                    .foregroundColor(.gray)
+                Button{
+                    print()
+                }label:{
+                    Image(systemName: "pencil")
+                        .foregroundColor(.gray)
+                }
             }
             .padding()
             .background(Color.white)

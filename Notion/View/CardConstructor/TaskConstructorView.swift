@@ -21,14 +21,14 @@ struct TaskConstructorView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack{
-                    if let emoji = getField(.text, named: "Emoji")?.asText {
+                    if let emoji = CardViewModel.getField(.text, named: "Emoji", task)?.asText {
                         Text(emoji)
                             .frame(width: 60, height: 60)
                             .font(.system(size: 60, weight: .bold))
                     }
                     
                     
-                    if let name = getField(.text, named: "Name")?.asText {
+                    if let name = CardViewModel.getField(.text, named: "Name", task)?.asText {
                         Text(name)
                             .font(.largeTitle)
                             .bold()
@@ -118,9 +118,7 @@ struct TaskConstructorView: View {
         }
     }
 
-    private func getField(_ type: FieldType, named: String) -> FieldDataValue? {
-        return task.fieldValues.first { $0.field.name == named && $0.field.type == type }?.value
-    }
+
 }
 
 private extension FieldDataValue {

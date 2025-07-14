@@ -6,15 +6,54 @@ struct CardConstructorView: View {
     @State private var fields: [Field] = [
         Field(name: "Title", type: .text)
     ]
-    
+    @State private var projectName : String = "New Project"
+    @State private var projectIcon : String = "📌"
     @State private var showAddFieldSheet = false
-    @State private var newFieldName = ""
+    @State private var newFieldName: String = ""
     @State private var newFieldType: FieldType = .text
-    @State private var newFieldOptions = ""
+    @State private var newFieldOptions : String = ""
+    @State private var isEditing: Bool = false
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack{
+                VStack{
+                   
+                    HStack(spacing: 12) {
+                               Group {
+                                   if isEditing {
+                                       TextField("", text: $projectIcon, onCommit: { isEditing = false })
+                                           .frame(width: 60, alignment: .center)
+                                           .multilineTextAlignment(.center)
+                                   } else {
+                                       Text(projectIcon)
+                                           .frame(width: 60, alignment: .center)
+                                   }
+                               }
+                               .font(.system(size: 50))
+
+                               Group {
+                                   if isEditing {
+                                       TextField("", text: $projectName, onCommit: { isEditing = false })
+                                           .frame(minWidth: 200, alignment: .leading)
+                                           .multilineTextAlignment(.leading)
+                                   } else {
+                                       Text(projectName)
+                                           .bold()
+                                           .frame(minWidth: 200, alignment: .leading)
+                                   }
+                               }
+                               .font(.system(size: 34, weight: .bold))
+                           }
+                           .frame(maxWidth: .infinity, alignment: .leading)
+                           .onTapGesture {
+                               withAnimation {
+                                   isEditing = true
+                               }
+                           }
+                           .padding()
+                       
+                }
                 List {
                     ForEach(fields) { field in
                         VStack(alignment: .leading) {
@@ -55,7 +94,7 @@ struct CardConstructorView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Card Constructor")
+            .navigationTitle("Project Constructor")
             .sheet(isPresented: $showAddFieldSheet) {
                 addFieldSheet
             }
@@ -137,7 +176,7 @@ struct CardConstructorView: View {
             return FieldValue(field: field, value: value)
         })
         
-        let newProject = Project(icon: "📌", projectName: "New Project", taskCards: [newTask])
+        let newProject = Project(icon: projectIcon, projectName: projectName, taskCards: [newTask])
         projects.append(newProject)
         
         print("✅ Project added. Total projects: \(projects.count)")
