@@ -11,7 +11,7 @@ struct TaskTreckerView: View {
     
     var tasks: [Task]
     var fields: [Field]
-    @State private var selectedFilter = "By Status"
+    @State private var selectedFilter = ""
     @State private var selectedFilterImage  = "arrow.right"
     
     var body: some View {

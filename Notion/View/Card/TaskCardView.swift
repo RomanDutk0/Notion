@@ -39,7 +39,7 @@ struct TaskCardView: View {
                 .frame(width: 15, height: 15)
 
                 Button {
-                    addTask()
+                    CardViewModel.addTask(fields: fields, tasks: &tasks)
                 } label: {
                     Image(systemName: "plus")
                         .opacity(0.3)
@@ -57,7 +57,7 @@ struct TaskCardView: View {
             }
 
             Button {
-                addTask()
+                CardViewModel.addTask(fields: fields, tasks: &tasks)
             } label: {
                 HStack {
                     Image(systemName: "plus")
@@ -81,23 +81,6 @@ struct TaskCardView: View {
         )
     }
     
-    private func addTask() {
-        let newFieldValues = fields.map { field in
-            FieldValue(field: field, value: defaultValue(for: field.type))
-        }
-        tasks.append(Task(fieldValues: newFieldValues))
-    }
-    
-    private func defaultValue(for type: FieldType) -> FieldDataValue {
-        switch type {
-        case .text: return .text("")
-        case .number: return .number(0)
-        case .boolean: return .boolean(false)
-        case .date: return .date(Date())
-        case .url: return .url("")
-        case .selection: return .selection("")
-        }
-    }
 }
 
 

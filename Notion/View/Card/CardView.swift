@@ -33,34 +33,21 @@ struct CardView: View {
     private func fieldRow(_ fieldValue: FieldValue) -> some View {
         switch fieldValue.value {
         case .text(let text):
-            labeledRow(fieldValue.field.name, text)
+            CardViewModel.labeledRow(fieldValue.field.name, text)
         case .number(let number):
-            labeledRow(fieldValue.field.name, String(number))
+            CardViewModel.labeledRow(fieldValue.field.name, String(number))
         case .boolean(let flag):
-            labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
+            CardViewModel.labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
         case .date(let date):
-            labeledRow(fieldValue.field.name, formatted(date))
+            CardViewModel.labeledRow(fieldValue.field.name, CardViewModel.formatted(date))
         case .url(let url):
-            labeledRow(fieldValue.field.name, url)
+            CardViewModel.labeledRow(fieldValue.field.name, url)
         case .selection(let option):
-            labeledRow(fieldValue.field.name, option)
+            CardViewModel.labeledRow(fieldValue.field.name, option)
         }
     }
     
-    private func labeledRow(_ label: String, _ value: String) -> some View {
-        HStack {
-            Text(value)
-                .font(.body)
-                .foregroundColor(.primary)
-            Spacer()
-        }
-    }
     
-    private func formatted(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
 }
 
 #Preview {

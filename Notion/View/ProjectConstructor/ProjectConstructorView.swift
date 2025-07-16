@@ -18,41 +18,41 @@ struct CardConstructorView: View {
         NavigationView {
             VStack{
                 VStack{
-                   
+                    
                     HStack(spacing: 12) {
-                               Group {
-                                   if isEditing {
-                                       TextField("", text: $projectIcon, onCommit: { isEditing = false })
-                                           .frame(width: 60, alignment: .center)
-                                           .multilineTextAlignment(.center)
-                                   } else {
-                                       Text(projectIcon)
-                                           .frame(width: 60, alignment: .center)
-                                   }
-                               }
-                               .font(.system(size: 50))
-
-                               Group {
-                                   if isEditing {
-                                       TextField("", text: $projectName, onCommit: { isEditing = false })
-                                           .frame(minWidth: 200, alignment: .leading)
-                                           .multilineTextAlignment(.leading)
-                                   } else {
-                                       Text(projectName)
-                                           .bold()
-                                           .frame(minWidth: 200, alignment: .leading)
-                                   }
-                               }
-                               .font(.system(size: 34, weight: .bold))
-                           }
-                           .frame(maxWidth: .infinity, alignment: .leading)
-                           .onTapGesture {
-                               withAnimation {
-                                   isEditing = true
-                               }
-                           }
-                           .padding()
-                       
+                        Group {
+                            if isEditing {
+                                TextField("", text: $projectIcon, onCommit: { isEditing = false })
+                                    .frame(width: 60, alignment: .center)
+                                    .multilineTextAlignment(.center)
+                            } else {
+                                Text(projectIcon)
+                                    .frame(width: 60, alignment: .center)
+                            }
+                        }
+                        .font(.system(size: 50))
+                        
+                        Group {
+                            if isEditing {
+                                TextField("", text: $projectName, onCommit: { isEditing = false })
+                                    .frame(minWidth: 200, alignment: .leading)
+                                    .multilineTextAlignment(.leading)
+                            } else {
+                                Text(projectName)
+                                    .bold()
+                                    .frame(minWidth: 200, alignment: .leading)
+                            }
+                        }
+                        .font(.system(size: 34, weight: .bold))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onTapGesture {
+                        withAnimation {
+                            isEditing = true
+                        }
+                    }
+                    .padding()
+                    
                 }
                 List {
                     ForEach(fields) { field in
@@ -83,7 +83,9 @@ struct CardConstructorView: View {
                 }
                 .padding(.horizontal)
                 
-                Button(action: saveProject) {
+                Button {
+                    ProjectViewModel.saveProject(projects: &projects, fields: fields, projectIcon: projectIcon, projectName: projectName)
+                }label: {
                     Text("Save Project")
                         .bold()
                         .padding()
@@ -127,7 +129,7 @@ struct CardConstructorView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        addField()
+                        ProjectViewModel.addField(name: newFieldName, type: newFieldType, optionsString: newFieldOptions, fields: &fields)
                     }.disabled(newFieldName.isEmpty)
                 }
                 ToolbarItem(placement: .cancellationAction) {
@@ -138,51 +140,9 @@ struct CardConstructorView: View {
             }
         }
     }
-    
-    private func addField() {
-        var options: [String] = []
-        if newFieldType == .selection {
-            options = newFieldOptions
-                .split(separator: ",")
-                .map { $0.trimmingCharacters(in: .whitespaces) }
-                .filter { !$0.isEmpty }
-        }
-        let field = Field(name: newFieldName, type: newFieldType, options: options)
-        fields.append(field)
-        
-        newFieldName = ""
-        newFieldOptions = ""
-        newFieldType = .text
-        showAddFieldSheet = false
-    }
-    
-    private func saveProject() {
-        let newTask = Task(fieldValues: fields.map { field in
-            let value: FieldDataValue
-            switch field.type {
-            case .text:
-                value = .text("")
-            case .selection:
-                value = .selection(field.options.first ?? "")
-            case .number:
-                value = .number(0)
-            case .boolean:
-                value = .boolean(false)
-            case .date:
-                value = .date(Date())
-            case .url:
-                value = .text("https://example.com")
-            }
-            return FieldValue(field: field, value: value)
-        })
-        
-        let newProject = Project(icon: projectIcon, projectName: projectName, taskCards: [newTask])
-        projects.append(newProject)
-        
-        print("✅ Project added. Total projects: \(projects.count)")
-    }
 }
-
+    
+    
 struct CardConstructorView_Previews: PreviewProvider {
     @State static var previewProjects: [Project] = []
 

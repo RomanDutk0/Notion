@@ -30,22 +30,13 @@ struct RowView: View {
     @ViewBuilder
     private func cellContent(for field: Field) -> some View {
         if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
-            Text(stringValue(for: fieldValue.value))
+            Text(CardViewModel.stringValue(for: fieldValue.value))
         } else {
             Text("-")
         }
     }
 
-    private func stringValue(for value: FieldDataValue) -> String {
-        switch value {
-        case .text(let str): return str
-        case .number(let num): return String(num)
-        case .boolean(let bool): return bool ? "✅" : "❌"
-        case .date(let date): return dateFormatter.string(from: date)
-        case .url(let urlStr): return urlStr
-        case .selection(let selection): return selection
-        }
-    }
+   
 
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
