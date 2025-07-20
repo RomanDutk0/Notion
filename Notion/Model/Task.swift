@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct Task: Identifiable {
+struct Task: Identifiable  {
     let id = UUID()
     var fieldValues: [FieldValue]
+    
 }

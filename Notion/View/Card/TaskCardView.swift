@@ -1,117 +1,72 @@
 import SwiftUI
+import UniformTypeIdentifiers
+
+
 
 struct TaskCardView: View {
-    var cardStatus: String = ""
-    
-    @State var tasks: [Task]
+    let cardStatus: String
+    @Binding var tasks: [Task]
     var fields: [Field]
+    @Binding var allTasks: [Task]
 
     var body: some View {
         VStack {
-            HStack(spacing: 4) {
-                HStack {
-                    Circle()
-                        .fill(Color.blue)
-                        .frame(width: 8, height: 8)
-                    Text(cardStatus)
-                        .font(.headline)
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(6)
-
-                Text("\(tasks.count)")
-                    .opacity(0.5)
-
+            HStack {
+                Text(cardStatus)
+                    .font(.headline)
                 Spacer()
-
-                Button {
-                    print("More tapped")
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .opacity(0.3)
-                        .padding()
-                        .foregroundColor(.black)
-                        .font(.headline)
-                }
-                .frame(width: 15, height: 15)
-
-                Button {
-                    CardViewModel.addTask(fields: fields, tasks: &tasks)
-                } label: {
-                    Image(systemName: "plus")
-                        .opacity(0.3)
-                        .padding()
-                        .foregroundColor(.black)
-                        .font(.headline)
-                }
-                .frame(width: 15, height: 15)
-                .padding(.leading, 10)
+                Text("\(tasks.count)").opacity(0.5)
             }
             .padding(.horizontal)
 
-            ForEach(tasks) { task in
+            ForEach($tasks) { task in
                 CardView(task: task)
             }
 
             Button {
-                CardViewModel.addTask(fields: fields, tasks: &tasks)
+                print("Add task tapped")
             } label: {
                 HStack {
                     Image(systemName: "plus")
-                    Text("New task")
+                    Text("New Task")
                     Spacer()
                 }
-                .frame(width: 235, height: 15)
-                .opacity(0.3)
                 .padding()
                 .background(Color.gray.opacity(0.1))
-                .cornerRadius(9)
-                .foregroundColor(.black)
-                .font(.headline)
+                .cornerRadius(8)
             }
         }
-        .padding(15)
         .frame(width: 290)
+        .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.gray.opacity(0.1))
         )
+        .onDrop(of: [.text], isTargeted: nil) { providers in
+            providers.first?.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { data, _ in
+                if let data = data as? Data,
+                   let idString = String(data: data, encoding: .utf8),
+                   let uuid = UUID(uuidString: idString) {
+                    DispatchQueue.main.async {
+                        moveTask(with: uuid)
+                    }
+                }
+            }
+            return true
+        }
     }
-    
+
+    private func moveTask(with id: UUID) {
+        if let index = allTasks.firstIndex(where: { $0.id == id }) {
+            var updatedTask = allTasks[index]
+
+            if let statusIndex = updatedTask.fieldValues.firstIndex(where: { $0.field.name == "Status" }) {
+                updatedTask.fieldValues[statusIndex].value = .selection(cardStatus)
+            }
+
+            allTasks[index] = updatedTask
+        }
+    }
+
 }
 
-
-#Preview {
-    TaskCardView(
-        cardStatus: "In Progress",
-        tasks: [
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("🚀 Product Launch")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection),
-                    value: .selection("In Progress")
-                )
-            ]),
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("📝 Write Docs")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection),
-                    value: .selection("Not Started")
-                )
-            ])
-        ],
-        fields: [
-            Field(name: "Name", type: .text),
-            Field(name: "Status", type: .selection)
-        ]
-    )
-}

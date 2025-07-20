@@ -7,7 +7,7 @@
 
 import SwiftUI
 struct ProjectRow: View {
-    var project: Project
+    @Binding var project: Project
     var onRequestDelete: () -> Void
 
     @State private var showDeleteConfirmation = false
@@ -40,7 +40,7 @@ struct ProjectRow: View {
         .background(
             NavigationLink(
                 destination: TaskTreckerView(
-                    tasks: project.taskCards,
+                    tasks: $project.taskCards,
                     fields: ProjectViewModel.getAllFields(project)),
                 isActive: $navigate,
                 label: { EmptyView() }

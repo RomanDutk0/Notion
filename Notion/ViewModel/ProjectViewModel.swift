@@ -10,7 +10,142 @@ import SwiftUI
 
 class ProjectViewModel : ObservableObject
 {
-    @Published var projects : [Project] = []
+    @Published var projects : [Project] = [
+        Project(
+            id: UUID(),
+            icon: "📝",
+            projectName: "Notion",
+            taskCards: [
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Product Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection("In Progress")
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Product Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection("In Progress")
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Product Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection("Not Started")
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("📝 Write Documentation")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]),
+                        value: .selection("Not Started")
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))
+                    )
+                ])
+            ]
+        ),
+        Project(
+            id: UUID(),
+            icon: "📚",
+            projectName: "Learning SwiftUI",
+            taskCards: [
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("👨‍💻 Read Documentation")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🧪 Build Prototype")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(true)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(100)
+                    )
+                ])
+            ]
+        ),
+        Project(
+            id: UUID(),
+            icon: "🌐",
+            projectName: "Website Redesign",
+            taskCards: [
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🎨 Create Mockups")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection("Done")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Preview URL", type: .url),
+                        value: .text("https://example.com/mockups")
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("💻 Develop Landing Page")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]),
+                        value: .selection("In Progress")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Launch Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 60))
+                    )
+                ])
+            ]
+        )
+    ]
+    
     
     
     static func numberOfCards(project : Project)-> Int{

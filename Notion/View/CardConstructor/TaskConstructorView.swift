@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TaskConstructorView: View {
-    var task: Task
+    @Binding var task: Task
 
     @State private var comment: String = ""
     @State private var subTasks: [SubTask] = [
@@ -10,13 +10,9 @@ struct TaskConstructorView: View {
         SubTask(title: "To do 3", isDone: true)
     ]
 
-    @State private var fieldValues: [FieldValue]
+ 
 
-    init(task: Task) {
-        self.task = task
-        _fieldValues = State(initialValue: task.fieldValues)
-    }
-
+   
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -37,7 +33,7 @@ struct TaskConstructorView: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: 16) {
-                    ForEach($fieldValues) { $fieldValue in
+                    ForEach($task.fieldValues) { $fieldValue in
                         HStack {
                             Label(fieldValue.field.name, systemImage: "circle.fill")
                             Spacer()
@@ -195,14 +191,15 @@ extension Binding where Value == FieldValue {
 }
 
 #Preview {
-    TaskConstructorView(task: Task(fieldValues: [
-        FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
-        FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
-        FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection("In Progress")),
-
-        FieldValue(field: Field(name: "Start Date", type: .date), value: .date(Date())),
-        FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date().addingTimeInterval(86400 * 30))),
-        FieldValue(field: Field(name: "Public", type: .boolean), value: .boolean(true)),
-        FieldValue(field: Field(name: "Website", type: .url), value: .url("https://example.com"))
-    ]))
+    TaskConstructorView(task: .constant(
+        Task(fieldValues: [
+            FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
+            FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
+            FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection("In Progress")),
+            FieldValue(field: Field(name: "Start Date", type: .date), value: .date(Date())),
+            FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date().addingTimeInterval(86400 * 30))),
+            FieldValue(field: Field(name: "Public", type: .boolean), value: .boolean(true)),
+            FieldValue(field: Field(name: "Website", type: .url), value: .url("https://example.com"))
+        ])
+    ))
 }

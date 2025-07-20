@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct CardView: View {
-    var task: Task
+    @Binding var task: Task
     
     @State private var showDetail = false
     
+    @State var currentDragging : Task?
     var body: some View {
         Button {
             showDetail = true
@@ -13,7 +14,7 @@ struct CardView: View {
                 ForEach(task.fieldValues) { fieldValue in
                     fieldRow(fieldValue)
                 }
-              
+                
             }
             .frame(width: 235)
             .padding()
@@ -22,10 +23,16 @@ struct CardView: View {
                     .fill(Color(.systemBackground))
                     .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
             )
+            .contentShape(.dragPreview , .rect(cornerRadius : 12))
         }
         .sheet(isPresented: $showDetail) {
-           TaskConstructorView(task: task)
+            TaskConstructorView(task: $task)
         }
+        .onDrag {
+            // Ми просто передаємо id як Data
+            return NSItemProvider(object: task.id.uuidString as NSString)
+        }
+    }
     }
     
    
@@ -48,7 +55,7 @@ struct CardView: View {
     }
     
     
-}
+
 
 #Preview {
     let fields = [
@@ -56,13 +63,12 @@ struct CardView: View {
         Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]),
         Field(name: "Due Date", type: .date)
     ]
-    
-    let task = Task(fieldValues: [
-        FieldValue(field: fields[0], value: .text("🚀Product Launch")),
-        FieldValue(field: fields[1], value: .selection("High")),
-        FieldValue(field: fields[2], value: .date(Date()))
-    ])
-    
-    return CardView(task: task)
-}
 
+    return CardView(task: .constant(
+        Task(fieldValues: [
+            FieldValue(field: fields[0], value: .text("🚀Product Launch")),
+            FieldValue(field: fields[1], value: .selection("High")),
+            FieldValue(field: fields[2], value: .date(Date()))
+        ])
+    ))
+}

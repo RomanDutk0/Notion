@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CardBoard: View {
-    var tasks: [Task]
+    @Binding var tasks: [Task]
     var fields: [Field]
 
    
@@ -14,21 +14,34 @@ struct CardBoard: View {
     }
 
     var body: some View {
-        ScrollView(.horizontal) {
+        ScrollView([.horizontal, .vertical]) {
             HStack(alignment: .top, spacing: 32) {
                 ForEach(uniqueStatuses, id: \.self) { status in
-                    if let groupedTasks = tasksByStatus[status] {
                         TaskCardView(
                             cardStatus: status,
-                            tasks: groupedTasks,
-                            fields: fields // Передаємо шаблон полів!
+                            tasks: bindingForTasks(withStatus: status),
+                            fields: fields, allTasks:  $tasks
                         )
-                    }
                 }
             }
             .padding()
         }
     }
+    private func bindingForTasks(withStatus status: String) -> Binding<[Task]> {
+        Binding(
+            get: {
+                tasks.filter { CardViewModel.status(for: $0) == status }
+            },
+            set: { newTasks in
+                for task in newTasks {
+                    if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                        tasks[index] = task
+                    }
+                }
+            }
+        )
+    }
+
 }
 
 #Preview {
@@ -71,7 +84,8 @@ struct CardBoard: View {
             FieldValue(field: fields[3], value: .selection("Critical"))
         ])
     ]
-
-    return CardBoard(tasks: tasks, fields: fields)
+    
+    @State var tasksState = tasks
+    
+    return CardBoard(tasks: $tasksState, fields: fields)
 }
-

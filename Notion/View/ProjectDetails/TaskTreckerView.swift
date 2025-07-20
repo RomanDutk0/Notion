@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TaskTreckerView: View {
     
-    var tasks: [Task]
+    @Binding var tasks: [Task]
     var fields: [Field]
     @State private var selectedFilter = ""
     @State private var selectedFilterImage  = "arrow.right"
@@ -91,9 +91,9 @@ struct TaskTreckerView: View {
                     }
                 }
                 if selectedFilter == "By Status" {
-                     CardBoard(tasks: tasks , fields: fields)
+                    CardBoard(tasks: $tasks , fields: fields)
                 } else {
-                    ProjectsTableView(fields: fields, tasks:tasks )
+                    ProjectsTableView(fields: fields, tasks: $tasks )
                 }
 
             }
@@ -113,8 +113,8 @@ struct TaskTreckerView: View {
         Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Completed", "Planning"]),
         Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low", "Critical"])
     ]
-    
-    let tasks = [
+
+    @State var tasks = [
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("🚀")),
             FieldValue(field: fields[1], value: .text("Product Launch")),
@@ -146,5 +146,7 @@ struct TaskTreckerView: View {
             FieldValue(field: fields[3], value: .selection("Critical"))
         ])
     ]
-    TaskTreckerView(tasks: tasks , fields : fields )
+
+    return TaskTreckerView(tasks: $tasks, fields: fields)
 }
+
