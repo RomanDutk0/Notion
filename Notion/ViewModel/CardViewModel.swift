@@ -94,6 +94,7 @@ class CardViewModel : ObservableObject
         }
     }
     
+    
     static func formatted(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium

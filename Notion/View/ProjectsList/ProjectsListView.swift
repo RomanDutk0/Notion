@@ -61,16 +61,17 @@ struct ProjectsListView: View {
                         CardConstructorView(projects: $projectModel.projects)
                     }
                 }
-                
-                List {
-                    ForEach($projectModel.projects) { $project in
-                        ProjectRow(project: $project) {
-                            projectToDelete = project
-                            showDeleteConfirmation = true
+                VStack{
+                    List {
+                        ForEach($projectModel.projects) { $project in
+                            ProjectRow(project: $project) {
+                                projectToDelete = project
+                                showDeleteConfirmation = true
+                            }
+                            .listRowSeparator(.hidden)
                         }
-                        .listRowSeparator(.hidden)
                     }
-                }
+                } 
                 .listStyle(.plain)
                 .confirmationDialog("Are you sure you want to delete this project?", isPresented: $showDeleteConfirmation) {
                     Button("Delete", role: .destructive) {

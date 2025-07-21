@@ -9,9 +9,8 @@ import SwiftUI
 struct ProjectRow: View {
     @Binding var project: Project
     var onRequestDelete: () -> Void
-
-    @State private var showDeleteConfirmation = false
     @State private var navigate = false
+    @State private var navigateToEditor = false
 
     var body: some View {
         HStack {
@@ -26,11 +25,14 @@ struct ProjectRow: View {
 
                 Button {
                     print("Edit tapped")
+                    navigateToEditor = true
                 } label: {
                     Image(systemName: "pencil")
                         .foregroundColor(.gray)
                 }
-                .padding(.trailing , 20)
+                .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
+                .padding(.trailing, 20)
             }
             .contentShape(Rectangle())
             .onTapGesture {
@@ -38,14 +40,25 @@ struct ProjectRow: View {
             }
         }
         .background(
-            NavigationLink(
-                destination: TaskTreckerView(
-                    tasks: $project.taskCards,
-                    fields: ProjectViewModel.getAllFields(project)),
-                isActive: $navigate,
-                label: { EmptyView() }
-            )
-            .hidden()
+            Group {
+                    NavigationLink(
+                        destination: TaskTreckerView(
+                            tasks: $project.taskCards,
+                            fields: ProjectViewModel.getAllFields(project)
+                        ),
+                        isActive: $navigate
+                    ) {
+                        EmptyView()
+                    }
+
+                    NavigationLink(
+                        destination: ProjectEditor(project: $project),
+                        isActive: $navigateToEditor
+                    ) {
+                        EmptyView()
+                    }
+                }
+                .hidden()
         )
         .padding()
         .background(Color.white)
@@ -53,7 +66,7 @@ struct ProjectRow: View {
         .shadow(color: Color.gray.opacity(0.1), radius: 2, x: 0, y: 1)
         .swipeActions {
             Button(role: .destructive) {
-                showDeleteConfirmation = true
+                onRequestDelete()
             } label: {
                 Label("Delete", systemImage: "trash")
             }

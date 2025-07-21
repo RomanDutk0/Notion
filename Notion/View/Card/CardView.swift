@@ -29,7 +29,6 @@ struct CardView: View {
             TaskConstructorView(task: $task)
         }
         .onDrag {
-            // Ми просто передаємо id як Data
             return NSItemProvider(object: task.id.uuidString as NSString)
         }
     }
@@ -48,7 +47,7 @@ struct CardView: View {
         case .date(let date):
             CardViewModel.labeledRow(fieldValue.field.name, CardViewModel.formatted(date))
         case .url(let url):
-            CardViewModel.labeledRow(fieldValue.field.name, url)
+                URLPreview(urlString: url)
         case .selection(let option):
             CardViewModel.labeledRow(fieldValue.field.name, option)
         }
@@ -61,14 +60,16 @@ struct CardView: View {
     let fields = [
         Field(name: "Name", type: .text),
         Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]),
-        Field(name: "Due Date", type: .date)
+        Field(name: "Due Date", type: .date),
+        Field(name: "Website", type: .url)
     ]
 
     return CardView(task: .constant(
         Task(fieldValues: [
-            FieldValue(field: fields[0], value: .text("🚀Product Launch")),
+            FieldValue(field: fields[0], value: .text("🚀 Product Launch")),
             FieldValue(field: fields[1], value: .selection("High")),
-            FieldValue(field: fields[2], value: .date(Date()))
+            FieldValue(field: fields[2], value: .date(Date())),
+            FieldValue(field: fields[3], value: .url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
         ])
     ))
 }

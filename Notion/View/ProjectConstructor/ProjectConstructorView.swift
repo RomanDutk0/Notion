@@ -96,7 +96,7 @@ struct CardConstructorView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Project Constructor")
+            .navigationTitle("")
             .sheet(isPresented: $showAddFieldSheet) {
                 addFieldSheet
             }

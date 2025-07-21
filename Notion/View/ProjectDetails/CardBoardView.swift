@@ -19,7 +19,6 @@ struct CardBoard: View {
                 ForEach(uniqueStatuses, id: \.self) { status in
                         TaskCardView(
                             cardStatus: status,
-                            tasks: bindingForTasks(withStatus: status),
                             fields: fields, allTasks:  $tasks
                         )
                 }
