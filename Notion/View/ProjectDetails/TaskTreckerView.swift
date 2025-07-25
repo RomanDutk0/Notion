@@ -105,7 +105,6 @@ struct TaskTreckerView: View {
 }
 
 
-
 #Preview {
     let fields = [
         Field(name: "Emoji", type: .text),
@@ -118,35 +117,34 @@ struct TaskTreckerView: View {
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("🚀")),
             FieldValue(field: fields[1], value: .text("Product Launch")),
-            FieldValue(field: fields[2], value: .selection("In Progress")),
-            FieldValue(field: fields[3], value: .selection("High"))
+            FieldValue(field: fields[2], value: .selection(["In Progress"])),
+            FieldValue(field: fields[3], value: .selection(["High"]))
         ]),
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("📝")),
             FieldValue(field: fields[1], value: .text("Write Documentation")),
-            FieldValue(field: fields[2], value: .selection("Not Started")),
-            FieldValue(field: fields[3], value: .selection("Medium"))
+            FieldValue(field: fields[2], value: .selection(["Not Started"])),
+            FieldValue(field: fields[3], value: .selection(["Medium"]))
         ]),
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("🎨")),
             FieldValue(field: fields[1], value: .text("Design New Logo")),
-            FieldValue(field: fields[2], value: .selection("Completed")),
-            FieldValue(field: fields[3], value: .selection("Low"))
+            FieldValue(field: fields[2], value: .selection(["Completed"])),
+            FieldValue(field: fields[3], value: .selection(["Low"]))
         ]),
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("📣")),
             FieldValue(field: fields[1], value: .text("Marketing Campaign")),
-            FieldValue(field: fields[2], value: .selection("Planning")),
-            FieldValue(field: fields[3], value: .selection("High"))
+            FieldValue(field: fields[2], value: .selection(["Planning"])),
+            FieldValue(field: fields[3], value: .selection(["High"]))
         ]),
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("🔍")),
             FieldValue(field: fields[1], value: .text("QA Testing")),
-            FieldValue(field: fields[2], value: .selection("In Progress")),
-            FieldValue(field: fields[3], value: .selection("Critical"))
+            FieldValue(field: fields[2], value: .selection(["In Progress"])),
+            FieldValue(field: fields[3], value: .selection(["Critical"]))
         ])
     ]
 
     return TaskTreckerView(tasks: $tasks, fields: fields)
 }
-

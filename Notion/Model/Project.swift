@@ -13,7 +13,8 @@ struct Project: Identifiable {
     var icon: String
     var projectName: String
     var taskCards: [Task]
-
+    
+    
     init(id: UUID = UUID(), icon: String, projectName: String, taskCards: [Task]) {
         self.id = id
         self.icon = icon

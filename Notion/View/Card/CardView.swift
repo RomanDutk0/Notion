@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct CardView: View {
+    
     @Binding var task: Task
-    
+    @Binding var tasks: [Task]
     @State private var showDetail = false
-    
     @State var currentDragging : Task?
+    
     var body: some View {
         Button {
             showDetail = true
@@ -26,7 +27,13 @@ struct CardView: View {
             .contentShape(.dragPreview , .rect(cornerRadius : 12))
         }
         .sheet(isPresented: $showDetail) {
-            TaskConstructorView(task: $task)
+            TaskConstructorView(
+                task: $task,
+                onDelete: {
+                    CardViewModel.deleteCard(&tasks, task)
+                }
+            )
+
         }
         .onDrag {
             return NSItemProvider(object: task.id.uuidString as NSString)
@@ -49,27 +56,24 @@ struct CardView: View {
         case .url(let url):
                 URLPreview(urlString: url)
         case .selection(let option):
-            CardViewModel.labeledRow(fieldValue.field.name, option)
+            CardViewModel.labeledRow(fieldValue.field.name, option.joined(separator: ", "))
         }
     }
     
     
 
-
 #Preview {
-    let fields = [
-        Field(name: "Name", type: .text),
-        Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]),
-        Field(name: "Due Date", type: .date),
-        Field(name: "Website", type: .url)
+    @State var previewTasks: [Task] = [
+        Task(fieldValues: [
+            FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
+            FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]), value: .selection(["High", "Urgent"])),
+            FieldValue(field: Field(name: "Due Date", type: .date), value: .date(Date())),
+            FieldValue(field: Field(name: "Website", type: .url), value: .url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+        ])
     ]
 
-    return CardView(task: .constant(
-        Task(fieldValues: [
-            FieldValue(field: fields[0], value: .text("🚀 Product Launch")),
-            FieldValue(field: fields[1], value: .selection("High")),
-            FieldValue(field: fields[2], value: .date(Date())),
-            FieldValue(field: fields[3], value: .url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
-        ])
-    ))
+    return CardView(
+        task: .constant(previewTasks[0]),
+        tasks: .constant(previewTasks)
+    )
 }

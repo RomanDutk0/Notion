@@ -1,9 +1,14 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+
+import SwiftUI
+import UniformTypeIdentifiers
+
 struct TaskCardView: View {
+    
     let cardStatus: String
-    let fields: [Field]
+    var fields: [Field]
     @Binding var allTasks: [Task]
 
     var body: some View {
@@ -11,34 +16,39 @@ struct TaskCardView: View {
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(cardStatus).bold()
+                Text(cardStatus)
+                    .bold()
                 Spacer()
                 Text("\(filteredTasks.count)").opacity(0.5)
             }
 
             ForEach(filteredTasks) { task in
-                CardView(task: Binding(
-                    get: { task },
-                    set: { updated in
-                        if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
-                            allTasks[i] = updated
+                            CardView(
+                                task: Binding(
+                                    get: { task },
+                                    set: { updated in
+                                        if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
+                                            allTasks[i] = updated
+                                        }
+                                    }
+                                ),
+                                tasks: $allTasks 
+                            )
                         }
-                    }
-                ))
-            }
+
 
             Button {
                 addTask()
             } label: {
                 Label("New Task", systemImage: "plus")
                     .padding()
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth:.infinity)
                     .background(.gray.opacity(0.2))
                     .cornerRadius(8)
             }
         }
         .padding()
-        .frame(width: 280)
+        .frame(width: 300)
         .background(RoundedRectangle(cornerRadius: 12).fill(.gray.opacity(0.1)))
         .onDrop(of: [.text], isTargeted: nil) { providers in
             providers.first?.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { data, _ in
@@ -59,7 +69,7 @@ struct TaskCardView: View {
             FieldValue(field: field, value: CardViewModel.defaultValue(for: field.type))
         }
         if let statusIndex = newFieldValues.firstIndex(where: { $0.field.name == "Status" }) {
-            newFieldValues[statusIndex].value = .selection(cardStatus)
+            newFieldValues[statusIndex].value = .selection([cardStatus])
         }
         allTasks.append(Task(fieldValues: newFieldValues))
     }
@@ -68,20 +78,19 @@ struct TaskCardView: View {
         if let index = allTasks.firstIndex(where: { $0.id == id }) {
             var updatedTask = allTasks[index]
             if let statusIndex = updatedTask.fieldValues.firstIndex(where: { $0.field.name == "Status" }) {
-                updatedTask.fieldValues[statusIndex].value = .selection(cardStatus)
+                updatedTask.fieldValues[statusIndex].value = .selection([cardStatus]) 
             }
             allTasks[index] = updatedTask
         }
     }
 }
 
-// MARK: - Preview Board
 
 struct KanbanBoardPreview: View {
     @State private var allTasks: [Task] = [
         Task(fieldValues: [
             FieldValue(field: Field(name: "Name", type: .text), value: .text("Design UI")),
-            FieldValue(field: Field(name: "Status", type: .selection, options: ["To Do", "In Progress", "Done"]), value: .selection("To Do"))
+            FieldValue(field: Field(name: "Status", type: .selection, options: ["To Do", "In Progress", "Done"]), value: .selection( ["To Do"]))
         ])
     ]
 

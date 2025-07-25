@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ProjectEditor: View {
-    @Binding var project: Project
     
+    @Binding var project: Project
     @State private var isEditing = false
     
     var body: some View {
@@ -80,9 +80,10 @@ struct ProjectEditor: View {
             taskCards: [
                 Task(fieldValues: [
                     FieldValue(field: Field(name: "Name", type: .text), value: .text("Example")),
-                    FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Low"]), value: .selection("High"))
+                    FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Low"]), value: .selection(["High"]))
                 ])
             ]
         )
     ))
 }
+

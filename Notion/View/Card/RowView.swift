@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct RowView: View {
+    
     @Binding var task: Task
+    @Binding var tasks: [Task]
     var fields: [Field]
-
     @State private var showDetail = false
     
     var body: some View {
@@ -22,7 +23,13 @@ struct RowView: View {
             
         }.foregroundColor(.black)
         .sheet(isPresented: $showDetail) {
-            TaskConstructorView(task: $task)
+            TaskConstructorView(
+                task: $task,
+                onDelete: {
+                    CardViewModel.deleteCard(&tasks, task)
+                }
+            )
+
         }
     }
         
@@ -46,16 +53,34 @@ struct RowView: View {
 }
 
 #Preview {
-    RowView(
-        task: .constant(
-            Task(fieldValues: [
-                FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
-                FieldValue(field: Field(name: "Status", type: .selection), value: .selection("In Progress")),
-                FieldValue(field: Field(name: "End date", type: .date), value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))),
-                FieldValue(field: Field(name: "Priority", type: .selection), value: .selection("High")),
-                FieldValue(field: Field(name: "Start date", type: .date), value: .date(Date()))
-            ])
-        ),
+    @State var previewTasks: [Task] = [
+        Task(fieldValues: [
+            FieldValue(
+                field: Field(name: "Name", type: .text),
+                value: .text("🚀 Product Launch")
+            ),
+            FieldValue(
+                field: Field(name: "Status", type: .selection),
+                value: .selection(["In Progress"])
+            ),
+            FieldValue(
+                field: Field(name: "End date", type: .date),
+                value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+            ),
+            FieldValue(
+                field: Field(name: "Priority", type: .selection),
+                value: .selection(["High"])
+            ),
+            FieldValue(
+                field: Field(name: "Start date", type: .date),
+                value: .date(Date())
+            )
+        ])
+    ]
+    
+    return RowView(
+        task: .constant(previewTasks[0]),
+        tasks: .constant(previewTasks),
         fields: [
             Field(name: "Name", type: .text),
             Field(name: "Status", type: .selection),
@@ -65,5 +90,3 @@ struct RowView: View {
         ]
     )
 }
-
-

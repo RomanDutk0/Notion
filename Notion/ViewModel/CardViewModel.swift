@@ -18,7 +18,7 @@ class CardViewModel : ObservableObject
         self.task = task
     }
     
-    static func getTaskFields(_ task: Task) -> [Field]
+    static func getTaskFields(_ task: Task) ->  [Field]
     {
         var fields : [Field] = []
         
@@ -44,15 +44,15 @@ class CardViewModel : ObservableObject
     }
 
     
-   static func status(for task: Task) -> String {
+    static func status(for task: Task) -> String {
         if let statusField = task.fieldValues.first(where: { $0.field.name == "Status" }) {
-            if case let .selection(value) = statusField.value {
-                return value
+            if case let .selection(values) = statusField.value {
+                return values.first ?? "Unknown"
             }
         }
         return "Unknown"
     }
-    
+
     static func getField(_ type: FieldType, named: String , _ task : Task) -> FieldDataValue? {
         return task.fieldValues.first { $0.field.name == named && $0.field.type == type }?.value
     }
@@ -71,10 +71,10 @@ class CardViewModel : ObservableObject
         case .boolean: return .boolean(false)
         case .date: return .date(Date())
         case .url: return .url("")
-        case .selection: return .selection("")
+        case .selection: return .selection([]) // порожній масив
         }
     }
-    
+
     static func stringValue(for value: FieldDataValue) -> String {
         switch value {
         case .text(let str): return str
@@ -82,9 +82,12 @@ class CardViewModel : ObservableObject
         case .boolean(let bool): return bool ? "✅" : "❌"
         case .date(let date): return CardViewModel.dateFormatter.string(from: date)
         case .url(let urlStr): return urlStr
-        case .selection(let selection): return selection
+        case .selection(let selections):
+           
+            return selections.isEmpty ? "—" : selections.joined(separator: ", ")
         }
     }
+
     static func labeledRow(_ label: String, _ value: String) -> some View {
         HStack {
             Text(value)
@@ -94,10 +97,51 @@ class CardViewModel : ObservableObject
         }
     }
     
+    static func addFieldToCard(
+       name: String,
+       type: FieldType,
+       optionsString: String,
+       fields: Binding<[FieldValue]>
+    ) {
+       let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+       guard !trimmedName.isEmpty else { return }
+
+       var options: [String] = []
+       if type == .selection {
+          options = optionsString
+             .split(separator: ",")
+             .map { $0.trimmingCharacters(in: .whitespaces) }
+             .filter { !$0.isEmpty }
+       }
+
+       let field = Field(name: trimmedName, type: type, options: options)
+
+       let defaultValue: FieldDataValue
+       switch type {
+       case .text: defaultValue = .text("")
+       case .number: defaultValue = .number(0)
+       case .boolean: defaultValue = .boolean(false)
+       case .date: defaultValue = .date(Date())
+       case .url: defaultValue = .url("")
+       case .selection: defaultValue = .selection([])
+       }
+
+       let fieldValue = FieldValue(field: field, value: defaultValue)
+       fields.wrappedValue.append(fieldValue)
+    }
+
+
+    
     
     static func formatted(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: date)
+    }
+    static func deleteCard(_ tasks: inout [Task] , _ task : Task)  -> Void{
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            tasks.remove(at: index)
+            print("Deleted")
+        }
     }
 }

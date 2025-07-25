@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct CardConstructorView: View {
-    @Binding var projects: [Project]
     
+    @Binding var projects: [Project]
     @State private var fields: [Field] = [
         Field(name: "Title", type: .text)
     ]

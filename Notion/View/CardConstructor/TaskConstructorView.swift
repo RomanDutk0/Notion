@@ -2,136 +2,154 @@ import SwiftUI
 
 struct TaskConstructorView: View {
     @Binding var task: Task
-
     @State private var comment: String = ""
     @State private var subTasks: [SubTask] = [
         SubTask(title: "To do 1", isDone: true),
         SubTask(title: "To do 2", isDone: true),
         SubTask(title: "To do 3", isDone: true)
     ]
-
- 
-
-   
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                HStack{
-                    if let emoji = CardViewModel.getField(.text, named: "Emoji", task)?.asText {
-                        Text(emoji)
-                            .frame(width: 60, height: 60)
-                            .font(.system(size: 60, weight: .bold))
-                    }
-                    
-                    
-                    if let name = CardViewModel.getField(.text, named: "Name", task)?.asText {
-                        Text(name)
-                            .font(.largeTitle)
-                            .bold()
-                    }
-                }
-                Divider()
-
-                VStack(alignment: .leading, spacing: 16) {
-                    ForEach($task.fieldValues) { $fieldValue in
-                        HStack {
-                            Label(fieldValue.field.name, systemImage: "circle.fill")
-                            Spacer()
-                            fieldEditor(for: $fieldValue)
-                        }
-                    }
-                }
-
-                Divider()
-
-                VStack(alignment: .leading) {
-                    Text("Comments")
-                        .font(.headline)
-                    TextField("Add a comment...", text: $comment)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                }
-
-                Divider()
-
-                VStack(alignment: .leading) {
-                    Text("Sub-tasks")
-                        .font(.headline)
-                    ForEach($subTasks) { $task in
-                        HStack {
-                            Image(systemName: task.isDone ? "checkmark.square" : "square")
-                                .onTapGesture {
-                                    task.isDone.toggle()
-                                }
-                            Text(task.title)
-                                .strikethrough(task.isDone)
-                                .foregroundColor(task.isDone ? .gray : .primary)
-                        }
-                    }
-                }
-
-            }
-            .padding()
-        }
-        .background(Color(.systemBackground))
-    }
+    @State private var showAddFieldSheet = false
 
     
+    var onDelete: () -> Void
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    HStack {
+                        if let emoji = CardViewModel.getField(.text, named: "Emoji", task)?.asText {
+                            Text(emoji)
+                                .frame(width: 60, height: 60)
+                                .font(.system(size: 60, weight: .bold))
+                        }
+
+                        if let name = CardViewModel.getField(.text, named: "Name", task)?.asText {
+                            Text(name)
+                                .font(.largeTitle)
+                                .bold()
+                        }
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach($task.fieldValues) { $fieldValue in
+                            HStack {
+                                Label(fieldValue.field.name, systemImage: "circle.fill")
+                                Spacer()
+                                fieldEditor(for: $fieldValue)
+                            }
+                        }
+                    }
+
+                    Button {
+                        showAddFieldSheet = true
+                    } label: {
+                        Text("Add property")
+                            .bold()
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading) {
+                        Text("Comments")
+                            .font(.headline)
+                        TextField("Add a comment...", text: $comment)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading) {
+                        Text("Sub-tasks")
+                            .font(.headline)
+                        ForEach($subTasks) { $task in
+                            HStack {
+                                Image(systemName: task.isDone ? "checkmark.square" : "square")
+                                    .onTapGesture {
+                                        task.isDone.toggle()
+                                    }
+                                Text(task.title)
+                                    .strikethrough(task.isDone)
+                                    .foregroundColor(task.isDone ? .gray : .primary)
+                            }
+                        }
+                    }
+
+                    Divider()
+
+    
+                    Button(role: .destructive) {
+                        onDelete()
+                    } label: {
+                        Label("Delete Task", systemImage: "trash")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red.opacity(0.1))
+                            .foregroundColor(.red)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding()
+            }
+            .background(Color(.systemBackground))
+            .sheet(isPresented: $showAddFieldSheet) {
+                AddPropertyView(
+                    task: $task,
+                    showAddFieldSheet: $showAddFieldSheet
+                )
+            }
+        }
+    }
+
     @ViewBuilder
     private func fieldEditor(for fieldValue: Binding<FieldValue>) -> some View {
         switch fieldValue.wrappedValue.value {
-        case .text(let text):
+        case .text:
             TextField("", text: fieldValue.textBinding)
                 .multilineTextAlignment(.trailing)
-
-        case .number(let num):
+        case .number:
             TextField("", value: fieldValue.numberBinding, formatter: NumberFormatter())
                 .multilineTextAlignment(.trailing)
-
-        case .selection(let selection):
+        case .selection(let selectionArray):
             Menu {
-                ForEach(fieldValue.wrappedValue.field.options, id: \.self) { option in
+                ForEach(fieldValue.wrappedValue.field.options ?? [], id: \.self) { option in
                     Button(option) {
-                        fieldValue.wrappedValue.value = .selection(option)
+                        fieldValue.wrappedValue.value = .selection([option])
                     }
                 }
             } label: {
-                Text(selection)
+                Text(selectionArray.joined(separator: ", "))
                     .foregroundColor(.gray)
             }
-
-        case .date(let date):
+        case .date:
             DatePicker("", selection: fieldValue.dateBinding, displayedComponents: [.date])
                 .labelsHidden()
-
-        case .boolean(let bool):
+        case .boolean:
             Toggle("", isOn: fieldValue.booleanBinding)
                 .labelsHidden()
-
-        case .url(let url):
+        case .url:
             TextField("", text: fieldValue.textBinding)
                 .keyboardType(.URL)
                 .multilineTextAlignment(.trailing)
         }
     }
-
-
 }
+
+// MARK: - Utils
 
 private extension FieldDataValue {
     var asText: String? {
         if case .text(let t) = self { return t }
         return nil
     }
-    var asSelection: String? {
-        if case .selection(let s) = self { return s }
-        return nil
-    }
-    var asDate: Date? {
-        if case .date(let d) = self { return d }
-        return nil
-    }
 }
-
 
 extension Binding where Value == FieldValue {
     var textBinding: Binding<String> {
@@ -191,15 +209,17 @@ extension Binding where Value == FieldValue {
 }
 
 #Preview {
-    TaskConstructorView(task: .constant(
-        Task(fieldValues: [
-            FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
-            FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
-            FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection("In Progress")),
-            FieldValue(field: Field(name: "Start Date", type: .date), value: .date(Date())),
-            FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date().addingTimeInterval(86400 * 30))),
-            FieldValue(field: Field(name: "Public", type: .boolean), value: .boolean(true)),
-            FieldValue(field: Field(name: "Website", type: .url), value: .url("https://example.com"))
-        ])
-    ))
+    TaskConstructorView(
+        task: .constant(
+            Task(fieldValues: [
+                FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
+                FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
+                FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection(["In Progress"]))
+            ])
+        ),
+        onDelete: {
+            print("Deleted task!")
+        }
+    )
 }
+

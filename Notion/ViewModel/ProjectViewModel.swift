@@ -23,7 +23,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                        value: .selection("In Progress")
+                        value: .selection(["In Progress"])
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
@@ -37,7 +37,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                        value: .selection("In Progress")
+                        value: .selection(["In Progress"])
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
@@ -51,7 +51,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                        value: .selection("Not Started")
+                        value: .selection(["Not Started"])
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
@@ -65,7 +65,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]),
-                        value: .selection("Not Started")
+                        value: .selection(["Not Started"])
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
@@ -121,7 +121,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                        value: .selection("Done")
+                        value: .selection(["Done"])
                     ),
                     FieldValue(
                         field: Field(name: "Preview URL", type: .url),
@@ -135,7 +135,7 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]),
-                        value: .selection("In Progress")
+                        value: .selection(["In Progress"])
                     ),
                     FieldValue(
                         field: Field(name: "Launch Date", type: .date),
@@ -177,7 +177,8 @@ class ProjectViewModel : ObservableObject
     static  func addField(
         name: String,
         type: FieldType,
-        optionsString: String, fields  :  inout [Field]
+        optionsString: String,
+        fields  :  inout [Field]
     ) {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
@@ -206,7 +207,7 @@ class ProjectViewModel : ObservableObject
             case .text:
                 value = .text("")
             case .selection:
-                value = .selection(field.options.first ?? "")
+                value = .selection([field.options.first ?? ""])
             case .number:
                 value = .number(0)
             case .boolean:

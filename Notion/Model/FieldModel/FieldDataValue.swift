@@ -13,6 +13,6 @@ enum FieldDataValue {
     case boolean(Bool)
     case date(Date)
     case url(String)
-    case selection(String)
+    case selection([String])
 }
 
