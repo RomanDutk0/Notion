@@ -82,7 +82,8 @@ struct ProjectEditor: View {
                     FieldValue(field: Field(name: "Name", type: .text), value: .text("Example")),
                     FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Low"]), value: .selection(["High"]))
                 ])
-            ]
+            ], template: [FieldValue(field: Field(name: "Name", type: .text), value: .text("Example")),
+                          FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Low"]), value: .selection(["High"]))]
         )
     ))
 }

@@ -2,15 +2,13 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 
-import SwiftUI
-import UniformTypeIdentifiers
-
 struct TaskCardView: View {
     
+    @ObservedObject var projectModel = ProjectViewModel.getInstance()
     let cardStatus: String
     var fields: [Field]
     @Binding var allTasks: [Task]
-
+    @Binding var hiddenFieldIDs: Set<UUID>
     var body: some View {
         let filteredTasks = allTasks.filter { CardViewModel.status(for: $0) == cardStatus }
 
@@ -23,22 +21,27 @@ struct TaskCardView: View {
             }
 
             ForEach(filteredTasks) { task in
-                            CardView(
-                                task: Binding(
-                                    get: { task },
-                                    set: { updated in
-                                        if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
-                                            allTasks[i] = updated
-                                        }
-                                    }
-                                ),
-                                tasks: $allTasks 
-                            )
+                CardView(
+                    task: Binding(
+                        get: { task },
+                        set: { updated in
+                            if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
+                                allTasks[i] = updated
+                            }
                         }
+                    ),
+                    tasks: $allTasks,
+                    hiddenFieldIDs: $hiddenFieldIDs
+                )
+            }
 
 
             Button {
-                addTask()
+                if let template = projectModel.template(forTask: allTasks.first) {
+                                   addTask(template: template)
+                               } else {
+                                   print("❌ Could not find template")
+                               }
             } label: {
                 Label("New Task", systemImage: "plus")
                     .padding()
@@ -64,14 +67,9 @@ struct TaskCardView: View {
         }
     }
 
-    private func addTask() {
-        var newFieldValues = fields.map { field in
-            FieldValue(field: field, value: CardViewModel.defaultValue(for: field.type))
-        }
-        if let statusIndex = newFieldValues.firstIndex(where: { $0.field.name == "Status" }) {
-            newFieldValues[statusIndex].value = .selection([cardStatus])
-        }
-        allTasks.append(Task(fieldValues: newFieldValues))
+    private func addTask(template : [FieldValue]) {
+        
+        allTasks.append(Task(fieldValues: template))
     }
 
     private func moveTask(with id: UUID) {
@@ -101,9 +99,9 @@ struct KanbanBoardPreview: View {
 
     var body: some View {
         HStack(spacing: 20) {
-            TaskCardView(cardStatus: "To Do", fields: fields, allTasks: $allTasks)
-            TaskCardView(cardStatus: "In Progress", fields: fields, allTasks: $allTasks)
-            TaskCardView(cardStatus: "Done", fields: fields, allTasks: $allTasks)
+           // TaskCardView(cardStatus: "To Do", fields: fields, allTasks: $allTasks, hiddenFieldIDs: )
+         //   TaskCardView(cardStatus: "In Progress", fields: fields, allTasks: $allTasks)
+          //  TaskCardView(cardStatus: "Done", fields: fields, allTasks: $allTasks)
         }
         .padding()
     }

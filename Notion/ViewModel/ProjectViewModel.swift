@@ -10,6 +10,9 @@ import SwiftUI
 
 class ProjectViewModel : ObservableObject
 {
+    
+    static let shared = ProjectViewModel()
+    
     @Published var projects : [Project] = [
         Project(
             id: UUID(),
@@ -72,7 +75,12 @@ class ProjectViewModel : ObservableObject
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))
                     )
                 ])
-            ]
+            ] ,
+            template: [
+                        FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
+                        FieldValue(field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]), value: .selection(["Not Started"])),
+                        FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date()))
+                    ]
         ),
         Project(
             id: UUID(),
@@ -107,7 +115,12 @@ class ProjectViewModel : ObservableObject
                         value: .number(100)
                     )
                 ])
-            ]
+            ],
+            template: [
+                        FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
+                        FieldValue(field: Field(name: "Completed", type: .boolean), value: .boolean(false)),
+                        FieldValue(field: Field(name: "Progress", type: .number), value: .number(0))
+                    ]
         ),
         Project(
             id: UUID(),
@@ -142,11 +155,20 @@ class ProjectViewModel : ObservableObject
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 60))
                     )
                 ])
-            ]
+            ],
+            template: [
+                        FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
+                        FieldValue(field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]), value: .selection(["Not Started"])),
+                        FieldValue(field: Field(name: "Launch Date", type: .date), value: .date(Date()))
+                    ]
         )
     ]
     
+    private init() { }
     
+    static func getInstance() -> ProjectViewModel {
+           return shared
+       }
     
     static func numberOfCards(project : Project)-> Int{
         return project.taskCards.count
@@ -200,8 +222,8 @@ class ProjectViewModel : ObservableObject
     }
 
     
-    static func saveProject(projects : inout [Project] , fields : [Field] , projectIcon: String , projectName: String  ) {
-        let newTask = Task(fieldValues: fields.map { field in
+    static func saveProject(projects: inout [Project], fields: [Field], projectIcon: String, projectName: String) {
+        let templateFieldValues: [FieldValue] = fields.map { field in
             let value: FieldDataValue
             switch field.type {
             case .text:
@@ -218,13 +240,18 @@ class ProjectViewModel : ObservableObject
                 value = .text("https://example.com")
             }
             return FieldValue(field: field, value: value)
-        })
-        
-        let newProject = Project(icon: projectIcon, projectName: projectName, taskCards: [newTask])
+        }
+
+
+        let newTask = Task(fieldValues: templateFieldValues)
+
+        let newProject = Project(icon: projectIcon, projectName: projectName, taskCards: [newTask], template: templateFieldValues)
+
         projects.append(newProject)
-        
+
         print("✅ Project added. Total projects: \(projects.count)")
     }
+
     
     static func deleteProject(_ projects: inout [Project] , _ project : Project) {
         if let index = projects.firstIndex(where: { $0.id == project.id }) {
@@ -232,6 +259,17 @@ class ProjectViewModel : ObservableObject
             print("Deleted")
         }
     }
+
+    func template(forTask task: Task?) -> [FieldValue]? {
+            guard let task = task else { return nil }
+            for project in projects {
+                if project.taskCards.contains(where: { $0.id == task.id }) {
+                    return project.templateOfFieldValues
+                }
+            }
+            return nil
+        }
+
 
     
 }

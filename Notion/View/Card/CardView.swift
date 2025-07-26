@@ -6,15 +6,17 @@ struct CardView: View {
     @Binding var tasks: [Task]
     @State private var showDetail = false
     @State var currentDragging : Task?
+    @Binding var hiddenFieldIDs: Set<UUID>
     
     var body: some View {
         Button {
             showDetail = true
         } label: {
             VStack(alignment: .leading, spacing: 8) {
-                ForEach(task.fieldValues) { fieldValue in
-                    fieldRow(fieldValue)
-                }
+                ForEach(task.fieldValues.filter { !hiddenFieldIDs.contains($0.field.id) }) { fieldValue in
+                        fieldRow(fieldValue)
+                    }
+                           
                 
             }
             .frame(width: 235)
@@ -28,7 +30,7 @@ struct CardView: View {
         }
         .sheet(isPresented: $showDetail) {
             TaskConstructorView(
-                task: $task,
+                task: $task,hiddenFieldIDs: $hiddenFieldIDs,
                 onDelete: {
                     CardViewModel.deleteCard(&tasks, task)
                 }
@@ -63,17 +65,25 @@ struct CardView: View {
     
 
 #Preview {
-    @State var previewTasks: [Task] = [
-        Task(fieldValues: [
-            FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
-            FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]), value: .selection(["High", "Urgent"])),
-            FieldValue(field: Field(name: "Due Date", type: .date), value: .date(Date())),
-            FieldValue(field: Field(name: "Website", type: .url), value: .url("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
-        ])
-    ]
+    struct PreviewWrapper: View {
+        @State var previewTasks: [Task] = [
+            Task(fieldValues: [
+                FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
+                FieldValue(field: Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low"]), value: .selection(["High", "Urgent"])),
+                FieldValue(field: Field(name: "Due Date", type: .date), value: .date(Date())),
+                FieldValue(field: Field(name: "Website", type: .url), value: .url("https://example.com"))
+            ])
+        ]
+        @State var hidden: Set<UUID> = []
 
-    return CardView(
-        task: .constant(previewTasks[0]),
-        tasks: .constant(previewTasks)
-    )
+        var body: some View {
+            CardView(
+                task: $previewTasks[0],
+                tasks: $previewTasks,
+                hiddenFieldIDs: $hidden
+            )
+        }
+    }
+
+    return PreviewWrapper()
 }

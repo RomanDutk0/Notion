@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var projectModel = ProjectViewModel()
+    @StateObject var projectModel = ProjectViewModel.getInstance()
     
     var body: some View {
         ProjectsListView(projectModel: projectModel)

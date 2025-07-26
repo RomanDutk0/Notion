@@ -13,6 +13,7 @@ struct TaskTreckerView: View {
     var fields: [Field]
     @State private var selectedFilter = ""
     @State private var selectedFilterImage  = "arrow.right"
+    @State private var hiddenFieldIDs = Set<UUID>()
     
     var body: some View {
         VStack{
@@ -91,9 +92,9 @@ struct TaskTreckerView: View {
                     }
                 }
                 if selectedFilter == "By Status" {
-                    CardBoard(tasks: $tasks , fields: fields)
+                    CardBoard(tasks: $tasks , fields: fields , hiddenFieldIDs: $hiddenFieldIDs)
                 } else {
-                    ProjectsTableView(fields: fields, tasks: $tasks )
+                    ProjectsTableView(fields: fields, tasks: $tasks, hiddenFieldIDs: $hiddenFieldIDs)
                 }
 
             }

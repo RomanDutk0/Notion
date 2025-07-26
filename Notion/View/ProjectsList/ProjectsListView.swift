@@ -70,6 +70,7 @@ struct ProjectsListView: View {
                             }
                             .listRowSeparator(.hidden)
                         }
+                        .onMove(perform: moveProject)
                     }
                 } 
                 .listStyle(.plain)
@@ -87,6 +88,9 @@ struct ProjectsListView: View {
             .navigationTitle("Dashboard")
         }
     }
+    private func moveProject(from source: IndexSet, to destination: Int) {
+            projectModel.projects.move(fromOffsets: source, toOffset: destination)
+        }
     
 }
 struct ProjectsListView_Previews: PreviewProvider {

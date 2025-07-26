@@ -4,8 +4,8 @@ struct CardBoard: View {
     
     @Binding var tasks: [Task]
     var fields: [Field]
-
-   
+    @Binding var hiddenFieldIDs: Set<UUID>
+    
     var tasksByStatus: [String: [Task]] {
         Dictionary(grouping: tasks, by: { CardViewModel.status(for: $0) })
     }
@@ -20,7 +20,7 @@ struct CardBoard: View {
                 ForEach(uniqueStatuses, id: \.self) { status in
                         TaskCardView(
                             cardStatus: status,
-                            fields: fields, allTasks:  $tasks
+                            fields: fields, allTasks:  $tasks , hiddenFieldIDs: $hiddenFieldIDs
                         )
                 }
             }
@@ -52,7 +52,7 @@ struct CardBoard: View {
         Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low", "Critical"])
     ]
     
-    let tasks = [
+    let initialTasks = [
         Task(fieldValues: [
             FieldValue(field: fields[0], value: .text("🚀")),
             FieldValue(field: fields[1], value: .text("Product Launch")),
@@ -85,8 +85,12 @@ struct CardBoard: View {
         ])
     ]
     
-    @State var tasksState = tasks
-    
-    return CardBoard(tasks: $tasksState, fields: fields)
-}
+    @State var tasksState = initialTasks
+    @State var hiddenFieldIDs: Set<UUID> = []
 
+    return CardBoard(
+        tasks: $tasksState,
+        fields: fields,
+        hiddenFieldIDs: $hiddenFieldIDs
+    )
+}

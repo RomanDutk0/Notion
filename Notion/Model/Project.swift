@@ -13,13 +13,14 @@ struct Project: Identifiable {
     var icon: String
     var projectName: String
     var taskCards: [Task]
+    var templateOfFieldValues: [FieldValue]
     
-    
-    init(id: UUID = UUID(), icon: String, projectName: String, taskCards: [Task]) {
+    init(id: UUID = UUID(), icon: String, projectName: String, taskCards: [Task] , template : [FieldValue]) {
         self.id = id
         self.icon = icon
         self.projectName = projectName
         self.taskCards = taskCards
+        self.templateOfFieldValues = template
     }
 }
 

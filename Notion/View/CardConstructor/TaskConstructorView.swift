@@ -9,10 +9,11 @@ struct TaskConstructorView: View {
         SubTask(title: "To do 3", isDone: true)
     ]
     @State private var showAddFieldSheet = false
-
+    @Binding var hiddenFieldIDs: Set<UUID>
+    @State private var showFieldVisibilitySheet = false
     
     var onDelete: () -> Void
-
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -23,26 +24,27 @@ struct TaskConstructorView: View {
                                 .frame(width: 60, height: 60)
                                 .font(.system(size: 60, weight: .bold))
                         }
-
+                        
                         if let name = CardViewModel.getField(.text, named: "Name", task)?.asText {
                             Text(name)
                                 .font(.largeTitle)
                                 .bold()
                         }
                     }
-
+                    
                     Divider()
-
-                    VStack(alignment: .leading, spacing: 16) {
-                        ForEach($task.fieldValues) { $fieldValue in
+                    
+                    ForEach($task.fieldValues) { $fieldValue in
+                      
                             HStack {
                                 Label(fieldValue.field.name, systemImage: "circle.fill")
                                 Spacer()
                                 fieldEditor(for: $fieldValue)
-                            }
+                    
                         }
                     }
-
+                    
+                    
                     Button {
                         showAddFieldSheet = true
                     } label: {
@@ -54,18 +56,29 @@ struct TaskConstructorView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-
+                    
+                    Button {
+                        showFieldVisibilitySheet = true
+                    } label: {
+                        Text("Hide / Show Fields")
+                            .bold()
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                     Divider()
-
+                    
                     VStack(alignment: .leading) {
                         Text("Comments")
                             .font(.headline)
                         TextField("Add a comment...", text: $comment)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     }
-
+                    
                     Divider()
-
+                    
                     VStack(alignment: .leading) {
                         Text("Sub-tasks")
                             .font(.headline)
@@ -81,10 +94,10 @@ struct TaskConstructorView: View {
                             }
                         }
                     }
-
+                    
                     Divider()
-
-    
+                    
+                    
                     Button(role: .destructive) {
                         onDelete()
                     } label: {
@@ -104,9 +117,15 @@ struct TaskConstructorView: View {
                     task: $task,
                     showAddFieldSheet: $showAddFieldSheet
                 )
+            }.sheet(isPresented: $showFieldVisibilitySheet) {
+                FieldVisibilityView(
+                    fields: task.fieldValues.map { $0.field },
+                    hiddenFieldIDs: $hiddenFieldIDs
+                )
             }
         }
     }
+
 
     @ViewBuilder
     private func fieldEditor(for fieldValue: Binding<FieldValue>) -> some View {
@@ -142,7 +161,7 @@ struct TaskConstructorView: View {
     }
 }
 
-// MARK: - Utils
+
 
 private extension FieldDataValue {
     var asText: String? {
@@ -209,17 +228,25 @@ extension Binding where Value == FieldValue {
 }
 
 #Preview {
-    TaskConstructorView(
-        task: .constant(
-            Task(fieldValues: [
-                FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
-                FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
-                FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection(["In Progress"]))
-            ])
-        ),
-        onDelete: {
-            print("Deleted task!")
-        }
-    )
-}
+    struct PreviewWrapper: View {
+        @State var sampleTask = Task(fieldValues: [
+            FieldValue(field: Field(name: "Emoji", type: .text), value: .text("🚀")),
+            FieldValue(field: Field(name: "Name", type: .text), value: .text("Product Launch")),
+            FieldValue(field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]), value: .selection(["In Progress"]))
+        ])
+        
+        @State var hiddenFields: Set<UUID> = []
 
+        var body: some View {
+            TaskConstructorView(
+                task: $sampleTask,
+                hiddenFieldIDs: $hiddenFields,
+                onDelete: {
+                    print("Deleted Task")
+                }
+            )
+        }
+    }
+
+    return PreviewWrapper()
+}

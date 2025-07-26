@@ -1,91 +1,118 @@
 import SwiftUI
+
+
 import SwiftUI
 
 struct ProjectsTableView: View {
     
     @State var fields: [Field]
     @Binding var tasks: [Task]
- 
+    @Binding var hiddenFieldIDs: Set<UUID>
+    
+    let columnWidth: CGFloat = 140  
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView(.horizontal) {
+            ScrollView([.horizontal], showsIndicators: true) {
                 VStack(spacing: 0) {
-                    ScrollView(.vertical) {
-                        HStack {
-                            ForEach(fields) { field in
-                                HStack(spacing: 4) {
-                                    Text(field.name)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.gray)
-                                    Button(action: {
-                                        if let index = fields.firstIndex(where: { $0.id == field.id }) {
-                                            fields.remove(at: index)
-                                        }
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.gray)
-                                            .imageScale(.small)
-                                            .opacity(0.3)
+                    HStack(alignment: .center, spacing: 0) {
+                        ForEach(fields) { field in
+                            HStack(spacing: 4) {
+                                Text(field.name)
+                                    .font(.footnote)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.vertical, 8)
+                                
+                                Button(action: {
+                                    if let index = fields.firstIndex(where: { $0.id == field.id }) {
+                                        fields.remove(at: index)
                                     }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.gray)
+                                        .opacity(0.6)
+                                        .imageScale(.small)
                                 }
-                                .frame(width: 120, alignment: .leading)
                             }
-
-                            Button(action: {
-                                fields.append(Field(name: "New Field", type: .text))
-                            }) {
-                                Image(systemName: "plus")
-                                    .foregroundColor(.blue)
+                            .frame(width: columnWidth, alignment: .center) 
+                            .padding(.horizontal, 8)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(6)
+                        }
+                        
+                        Button(action: {
+                            fields.append(Field(name: "New Field", type: .text))
+                        }) {
+                            Image(systemName: "plus.circle")
+                                .foregroundColor(.blue)
+                                .imageScale(.medium)
+                        }
+                        .padding(.leading, 8)
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
+                    .background(Color(.systemGray5))
+                    
+                    Divider()
+                    
+               
+                    ScrollView(.vertical, showsIndicators: true) {
+                        LazyVStack(spacing: 0) {
+                            ForEach($tasks) { $task in
+                                RowView(
+                                    task: $task,
+                                    tasks: $tasks,
+                                    fields: fields,
+                                    hiddenFieldIDs: $hiddenFieldIDs,
+                                    columnWidth: columnWidth 
+                                )
+                                .padding(.horizontal)
+                                .frame(height: 60)
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
+                                .padding(.vertical, 4)
+                                
+                                Divider()
                             }
-
-                            Spacer()
                         }
-                        .padding()
-                        .background(Color(UIColor.systemGray6))
-
-                        Divider()
-
-                        ForEach($tasks) { $task in
-                            RowView(task: $task,tasks: $tasks , fields: fields)
-                            Divider()
-                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                     }
                 }
             }
         }
-        .background(Color.white)
+        .background(Color(.systemGroupedBackground))
     }
 }
+
 
 struct ProjectsTableView_Previews: PreviewProvider {
     @State static var tasks: [Task] = [
         Task(fieldValues: [
-            FieldValue(field: Field(name: "Name", type: .text), value: .text("🚀 Product Launch")),
-            FieldValue(field: Field(name: "Status", type: .selection), value: .selection(["In Progress"])),
-            FieldValue(field: Field(name: "End date", type: .date), value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))),
-            FieldValue(field: Field(name: "Priority", type: .selection), value: .selection(["High"])),
-            FieldValue(field: Field(name: "Start date", type: .date), value: .date(Date()))
+            FieldValue(field: Field(name: "Title", type: .text), value: .text("🚀 Launch App")),
+            FieldValue(field: Field(name: "Status", type: .text), value: .text("In Progress"))
         ]),
         Task(fieldValues: [
-            FieldValue(field: Field(name: "Name", type: .text), value: .text("📝 Write Documentation")),
-            FieldValue(field: Field(name: "Status", type: .selection), value: .selection(["Not Started"])),
-            FieldValue(field: Field(name: "End date", type: .date), value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))),
-            FieldValue(field: Field(name: "Priority", type: .selection), value: .selection(["Medium"])),
-            FieldValue(field: Field(name: "Start date", type: .date), value: .date(Date()))
+            FieldValue(field: Field(name: "Title", type: .text), value: .text("🛠 Fix Bugs")),
+            FieldValue(field: Field(name: "Status", type: .text), value: .text("To Do"))
         ])
     ]
+    
+    @State static var hiddenFieldIDs: Set<UUID> = []
 
     static var previews: some View {
         ProjectsTableView(
             fields: [
-                Field(name: "Name", type: .text),
-                Field(name: "Status", type: .selection, options: ["In Progress", "Not Started"]),
-                Field(name: "End date", type: .date),
-                Field(name: "Priority", type: .selection, options: ["High", "Medium"]),
-                Field(name: "Start date", type: .date)
+                Field(name: "Title", type: .text),
+                Field(name: "Status", type: .text)
             ],
-            tasks: $tasks
+            tasks: $tasks,
+            hiddenFieldIDs: $hiddenFieldIDs
         )
+        .previewLayout(.sizeThatFits)
     }
 }
