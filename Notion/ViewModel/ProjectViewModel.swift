@@ -29,6 +29,10 @@ class ProjectViewModel : ObservableObject
                         value: .selection(["In Progress"])
                     ),
                     FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["In Progress1"])
+                    ),
+                    FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
                     )
@@ -43,6 +47,10 @@ class ProjectViewModel : ObservableObject
                         value: .selection(["In Progress"])
                     ),
                     FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["In Progress1"])
+                    ),
+                    FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
                     )
@@ -55,6 +63,10 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
                         value: .selection(["Not Started"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["Done1"])
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
@@ -71,6 +83,10 @@ class ProjectViewModel : ObservableObject
                         value: .selection(["Not Started"])
                     ),
                     FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["Done1"])
+                    ),
+                    FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))
                     )
@@ -79,6 +95,7 @@ class ProjectViewModel : ObservableObject
             template: [
                         FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
                         FieldValue(field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]), value: .selection(["Not Started"])),
+                        FieldValue(field: Field(name: "GO", type: .selection, options: ["Not Started1", "In Progress1", "Done1"]), value: .selection(["Not Started1"])),
                         FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date()))
                     ]
         ),

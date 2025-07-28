@@ -1,13 +1,11 @@
 import SwiftUI
 
-
-import SwiftUI
-
 struct ProjectsTableView: View {
     
     @State var fields: [Field]
     @Binding var tasks: [Task]
     @Binding var hiddenFieldIDs: Set<UUID>
+    @State private var showAddFieldSheet = false
     
     let columnWidth: CGFloat = 140  
     var body: some View {
@@ -35,14 +33,15 @@ struct ProjectsTableView: View {
                                         .imageScale(.small)
                                 }
                             }
-                            .frame(width: columnWidth, alignment: .center) 
+                            .frame(width: columnWidth, alignment: .center)
                             .padding(.horizontal, 8)
                             .background(Color(.systemGray6))
                             .cornerRadius(6)
                         }
                         
                         Button(action: {
-                            fields.append(Field(name: "New Field", type: .text))
+                            //fields.append(Field(name: "New Field", type: .text))
+                            showAddFieldSheet = true
                         }) {
                             Image(systemName: "plus.circle")
                                 .foregroundColor(.blue)
@@ -67,7 +66,7 @@ struct ProjectsTableView: View {
                                     tasks: $tasks,
                                     fields: fields,
                                     hiddenFieldIDs: $hiddenFieldIDs,
-                                    columnWidth: columnWidth 
+                                    columnWidth: columnWidth
                                 )
                                 .padding(.horizontal)
                                 .frame(height: 60)
@@ -86,6 +85,7 @@ struct ProjectsTableView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
+        
     }
 }
 

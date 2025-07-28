@@ -43,7 +43,7 @@ struct ProjectRow: View {
             Group {
                     NavigationLink(
                         destination: TaskTreckerView(
-                            tasks: $project.taskCards,
+                            project: $project,
                             fields: ProjectViewModel.getAllFields(project)
                         ),
                         isActive: $navigate

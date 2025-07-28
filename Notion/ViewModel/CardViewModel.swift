@@ -44,8 +44,8 @@ class CardViewModel : ObservableObject
     }
 
     
-    static func status(for task: Task) -> String {
-        if let statusField = task.fieldValues.first(where: { $0.field.name == "Status" }) {
+    static func status(for task: Task , field : String) -> String {
+        if let statusField = task.fieldValues.first(where: { $0.field.name == field }) {
             if case let .selection(values) = statusField.value {
                 return values.first ?? "Unknown"
             }
@@ -93,9 +93,12 @@ class CardViewModel : ObservableObject
             Text(value)
                 .font(.body)
                 .foregroundColor(.primary)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)                    
             Spacer()
         }
     }
+
     
     static func addFieldToCard(
        name: String,

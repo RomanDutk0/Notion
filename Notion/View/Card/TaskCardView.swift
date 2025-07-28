@@ -9,8 +9,9 @@ struct TaskCardView: View {
     var fields: [Field]
     @Binding var allTasks: [Task]
     @Binding var hiddenFieldIDs: Set<UUID>
+    @Binding  var selectedViewOption: ViewOption
     var body: some View {
-        let filteredTasks = allTasks.filter { CardViewModel.status(for: $0) == cardStatus }
+        let filteredTasks = allTasks.filter { CardViewModel.status(for: $0, field: selectedViewOption.groupByFieldName!) == cardStatus }
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -75,8 +76,8 @@ struct TaskCardView: View {
     private func moveTask(with id: UUID) {
         if let index = allTasks.firstIndex(where: { $0.id == id }) {
             var updatedTask = allTasks[index]
-            if let statusIndex = updatedTask.fieldValues.firstIndex(where: { $0.field.name == "Status" }) {
-                updatedTask.fieldValues[statusIndex].value = .selection([cardStatus]) 
+            if let statusIndex = updatedTask.fieldValues.firstIndex(where: { $0.field.name == selectedViewOption.groupByFieldName! }) {
+                updatedTask.fieldValues[statusIndex].value = .selection([cardStatus])
             }
             allTasks[index] = updatedTask
         }
