@@ -6,7 +6,7 @@ struct CardBoard: View {
     @Binding   var selectedViewOption: ViewOption
     var fields: [Field]
     @Binding var hiddenFieldIDs: Set<UUID>
-    @Binding var searchText : String
+   
     
     var tasksByStatus: [String: [Task]] {
         Dictionary(grouping: tasks, by: { CardViewModel.status(for: $0 , field:selectedViewOption.groupByFieldName! ) })
@@ -16,18 +16,7 @@ struct CardBoard: View {
         Array(tasksByStatus.keys)
     }
 
-    var filteredTasks: [Task] {
-        guard !searchText.isEmpty else {
-            return tasks
-        }
-
-        return tasks.filter { task in
-            task.fieldValues.contains { fieldValue in
-                CardViewModel.stringValue(for: fieldValue.value)
-                    .localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
+ 
 
     
     var body: some View {
@@ -115,7 +104,7 @@ struct CardBoard: View {
                 tasks: $tasksState,
                 selectedViewOption: $selectedViewOption,
                 fields: Self.fields,
-                hiddenFieldIDs: $hiddenFieldIDs, searchText:$txt
+                hiddenFieldIDs: $hiddenFieldIDs
             )
         }
     }
