@@ -1,15 +1,12 @@
-//
 //  TaskTreckerView.swift
 //  Notion
 //
 //  Created by Roman on 04.07.2025.
-//
-
 
 import SwiftUI
 
 struct TaskTreckerView: View {
-    
+
     @Binding var project: Project
     var fields: [Field]
 
@@ -17,77 +14,25 @@ struct TaskTreckerView: View {
     @State private var selectedFilterImage  = "arrow.right"
     @State private var hiddenFieldIDs = Set<UUID>()
     @State private var selectedViewOption =  ViewOption(title: "All tasks", icon: "star", type: .table, groupByFieldName: nil)
-    
+
     @State private var searchText = ""
     @State private var isSearching = false
     @State private var showAddViewOptionSheet = false
     @State private var selectedSortField: FieldValue? = nil
     @State private var showSortMenu = false
 
+    @State private var showFilterMenu = false
+    @State private var filterValues: [UUID: FieldDataValue] = [:]
+    @State private var filterSelectionValues: [UUID: [String]] = [:]
 
-    func filteredBinding(_ tasks: Binding<[Task]>, searchText: String) -> Binding<[Task]> {
-        Binding<[Task]>(
-            get: {
-                guard !searchText.isEmpty else {
-                    return tasks.wrappedValue
-                }
-
-                return tasks.wrappedValue.filter { task in
-                    task.fieldValues.contains { fieldValue in
-                        CardViewModel.stringValue(for: fieldValue.value)
-                            .localizedCaseInsensitiveContains(searchText)
-                    }
-                }
-            },
-            set: { updatedTasks in
-                for updated in updatedTasks {
-                    if let index = tasks.wrappedValue.firstIndex(where: { $0.id == updated.id }) {
-                        tasks.wrappedValue[index] = updated
-                    }
-                }
-            }
-        )
-    }
-    
-    func filteredAndSortedTasksBinding(
-        base: Binding<[Task]>,
-        searchText: String,
-        sort: ((Task, Task) -> Bool)?
-    ) -> Binding<[Task]> {
-        
-        Binding<[Task]>(
-            get: {
-                base.wrappedValue
-                    .filter { task in
-                        searchText.isEmpty ||
-                        task.fieldValues.contains {
-                            CardViewModel.stringValue(for: $0.value)
-                                .localizedCaseInsensitiveContains(searchText)
-                        }
-                    }
-                    .sorted(by: sort ?? { _, _ in false })
-            },
-            set: { newTasks in
-                for task in newTasks {
-                    if let index = base.wrappedValue.firstIndex(where: { $0.id == task.id }) {
-                        base.wrappedValue[index] = task
-                    }
-                }
-            }
-        )
-    }
-
-    
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 16) {
-
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Tasks Tracker")
                         .font(.largeTitle)
                         .bold()
                         .foregroundColor(.black)
-
                     Text("Stay organized with tasks, your way.")
                         .foregroundColor(.gray)
                 }
@@ -104,12 +49,11 @@ struct TaskTreckerView: View {
                             }
                         }
                         Divider()
-
-                            Button {
-                                showAddViewOptionSheet = true
-                            } label: {
-                                Label("Додати перегляд", systemImage: "plus")
-                            }
+                        Button {
+                            showAddViewOptionSheet = true
+                        } label: {
+                            Label("Додати перегляд", systemImage: "plus")
+                        }
                     } label: {
                         HStack {
                             Image(systemName: selectedFilterImage)
@@ -125,14 +69,12 @@ struct TaskTreckerView: View {
                         }
                     }
 
-
                     Spacer()
 
                     if isSearching {
                         TextField("Search...", text: $searchText)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(maxWidth: 200)
-
                         Button(action: {
                             withAnimation {
                                 searchText = ""
@@ -168,14 +110,22 @@ struct TaskTreckerView: View {
                         .presentationDetents([.fraction(0.5)])
                     }
 
-
-
-
                     Button {
-                        print("Filter tapped")
+                        showFilterMenu.toggle()
                     } label: {
                         Image(systemName: "slider.horizontal.3")
                             .foregroundColor(.black)
+                    }
+                    .sheet(isPresented: $showFilterMenu) {
+                        FilterFieldPickerView(
+                            fields: fields.filter { $0.type == .selection },
+                            selectedFilterValues: $filterSelectionValues,
+                            isPresented: $showFilterMenu
+                        )
+                        .onDisappear {
+                            filterValues = filterSelectionValues.mapValues { .selection($0) }
+                        }
+                        .presentationDetents([.fraction(0.5)])
                     }
 
                     Button {
@@ -192,17 +142,12 @@ struct TaskTreckerView: View {
                 switch selectedViewOption.type {
                 case .board:
                     CardBoard(
-                        tasks: filteredAndSortedTasksBinding(base: $project.taskCards, searchText:  searchText, sort: { lhs, rhs in
-                            guard let sortField = selectedSortField?.field.name else { return false }
-
-                            let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortField })?.value
-                            let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortField })?.value
-
-                            let lhsString = CardViewModel.stringValue(for: lhsValue!)
-                            let rhsString = CardViewModel.stringValue(for: rhsValue!)
-
-                            return lhsString < rhsString
-                        }),
+                        tasks: filteredAndSortedTasksBinding(
+                            base: $project.taskCards,
+                            searchText: searchText,
+                            sort: createSortClosure(),
+                            filters: filterValues
+                        ),
                         selectedViewOption: $selectedViewOption,
                         fields: fields,
                         hiddenFieldIDs: $hiddenFieldIDs
@@ -211,17 +156,12 @@ struct TaskTreckerView: View {
                 case .table:
                     ProjectsTableView(
                         fields: fields,
-                        tasks: filteredAndSortedTasksBinding(base: $project.taskCards, searchText:  searchText, sort: { lhs, rhs in
-                            guard let sortField = selectedSortField?.field.name else { return false }
-
-                            let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortField })?.value
-                            let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortField })?.value
-
-                            let lhsString = CardViewModel.stringValue(for: lhsValue!)
-                            let rhsString = CardViewModel.stringValue(for: rhsValue!)
-
-                            return lhsString < rhsString
-                        }),
+                        tasks: filteredAndSortedTasksBinding(
+                            base: $project.taskCards,
+                            searchText: searchText,
+                            sort: createSortClosure(),
+                            filters: filterValues
+                        ),
                         hiddenFieldIDs: $hiddenFieldIDs
                     )
                 }
@@ -232,61 +172,69 @@ struct TaskTreckerView: View {
             Spacer()
         }
     }
-    
 
+    func filteredAndSortedTasksBinding(
+        base: Binding<[Task]>,
+        searchText: String,
+        sort: ((Task, Task) -> Bool)?,
+        filters: [UUID: FieldDataValue]
+    ) -> Binding<[Task]> {
+        Binding<[Task]>(
+            get: {
+                base.wrappedValue
+                    .filter { task in
+                        let matchesSearch = searchText.isEmpty || task.fieldValues.contains {
+                            CardViewModel.stringValue(for: $0.value).localizedCaseInsensitiveContains(searchText)
+                        }
+                        let matchesFilters = filters.allSatisfy { (fieldID, filterValue) in
+                            task.fieldValues.contains {
+                                $0.field.id == fieldID && $0.value.matches(filterValue)
+                            }
+                        }
+                        return matchesSearch && matchesFilters
+                    }
+                    .sorted(by: sort ?? { _, _ in false })
+            },
+            set: { newTasks in
+                for task in newTasks {
+                    if let index = base.wrappedValue.firstIndex(where: { $0.id == task.id }) {
+                        base.wrappedValue[index] = task
+                    }
+                }
+            }
+        )
+    }
+
+    func createSortClosure() -> ((Task, Task) -> Bool)? {
+        guard let sortField = selectedSortField?.field.name else { return nil }
+        return { lhs, rhs in
+            let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortField })?.value
+            let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortField })?.value
+            let lhsString = CardViewModel.stringValue(for: lhsValue ?? .text(""))
+            let rhsString = CardViewModel.stringValue(for: rhsValue ?? .text(""))
+            return lhsString < rhsString
+        }
+    }
 }
 
-#Preview {
-    @State var previewProject = Project(
-        id: UUID(),
-        icon: "📝",
-        projectName: "Notion",
-        taskCards: [
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("🚀 Product Launch")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                    value: .selection(["In Progress"])
-                ),
-                FieldValue(
-                    field: Field(name: "End Date", type: .date),
-                    value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
-                )
-            ]),
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("📝 Write Documentation")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]),
-                    value: .selection(["Not Started"])
-                ),
-                FieldValue(
-                    field: Field(name: "End Date", type: .date),
-                    value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))
-                )
-            ])
-        ],
-        template: [
-            FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
-            FieldValue(field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]), value: .selection(["Not Started"])),
-            FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date()))
-        ],
-        viewOptions: [
-            ViewOption(title: "By Status", icon: "arrow.right", type: .board, groupByFieldName: "Status"),
-            ViewOption(title: "All tasks", icon: "star", type: .table, groupByFieldName: nil),
-        ]
-    )
-    
-    let fields = [
-        Field(name: "Name", type: .text),
-        Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Completed"]),
-        Field(name: "End Date", type: .date)
-    ]
-    
-    TaskTreckerView(project: $previewProject, fields: fields)
+extension FieldDataValue {
+    func matches(_ other: FieldDataValue) -> Bool {
+        switch (self, other) {
+        case let (.text(a), .text(b)):
+            return a.localizedCaseInsensitiveContains(b)
+        case let (.number(a), .number(b)):
+            return a == b
+        case let (.boolean(a), .boolean(b)):
+            return a == b
+        case let (.date(a), .date(b)):
+            return Calendar.current.isDate(a, inSameDayAs: b)
+        case let (.url(a), .url(b)):
+            return a == b
+        case let (.selection(a), .selection(b)):
+            return !Set(b).isDisjoint(with: a)
+        default:
+            return false
+        }
+    }
 }
+

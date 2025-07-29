@@ -14,5 +14,7 @@ enum FieldDataValue {
     case date(Date)
     case url(String)
     case selection([String])
+    
+    
 }
 
