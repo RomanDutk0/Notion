@@ -131,7 +131,7 @@ struct TaskTreckerView: View {
                     }
                     
                     Button {
-                        print("Add tapped")
+                        cardModel.addTask( to: $project.taskCards ,template: project.templateOfFieldValues)
                     } label: {
                         Image(systemName: "plus")
                             .padding(12)

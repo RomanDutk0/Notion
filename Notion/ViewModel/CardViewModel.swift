@@ -205,8 +205,11 @@ class CardViewModel: ObservableObject {
             labeledRow(fieldValue.field.name, option.joined(separator: ", "))
         }
     }
-    
-    
+   
+    func addTask(to tasks: Binding<[Task]>, template: [FieldValue]) {
+        tasks.wrappedValue.append(Task(fieldValues: template))
+    }
+
     
 }
 
@@ -229,6 +232,7 @@ extension FieldDataValue {
             return false
         }
     }
+    
     
     
 }

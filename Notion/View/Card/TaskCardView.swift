@@ -45,7 +45,7 @@ struct TaskCardView: View {
 
             Button {
                 if let template = projectModel.template(forTask: allTasks.first) {
-                                   addTask(template: template)
+                    cardModel.addTask( to: $allTasks ,template: template)
                                } else {
                                    print("❌ Could not find template")
                                }
@@ -74,11 +74,7 @@ struct TaskCardView: View {
         }
     }
 
-    private func addTask(template : [FieldValue]) {
-        
-        allTasks.append(Task(fieldValues: template))
-    }
-
+    
     private func moveTask(with id: UUID) {
         if let index = allTasks.firstIndex(where: { $0.id == id }) {
             var updatedTask = allTasks[index]
