@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+
+@MainActor
 class ProjectViewModel : ObservableObject
 {
     

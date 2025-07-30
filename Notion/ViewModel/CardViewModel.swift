@@ -7,10 +7,11 @@
 
 import Foundation
 import SwiftUICore
+import SwiftUI
 
 
-class CardViewModel : ObservableObject
-{
+@MainActor
+class CardViewModel: ObservableObject {
     
     @Published var task: Task
     
@@ -18,16 +19,8 @@ class CardViewModel : ObservableObject
         self.task = task
     }
     
-    static func getTaskFields(_ task: Task) ->  [Field]
-    {
-        var fields : [Field] = []
-        
-        for temp in task.fieldValues
-        {
-            fields.append(temp.field)
-        }
-        
-        return fields
+    static func getTaskFields(_ task: Task) -> [Field] {
+        task.fieldValues.map { $0.field }
     }
     
     static func dateString(from date: Date) -> String {
@@ -36,15 +29,14 @@ class CardViewModel : ObservableObject
         formatter.timeStyle = .none
         return formatter.string(from: date)
     }
-    
+
     static var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter
     }
 
-    
-    static func status(for task: Task , field : String) -> String {
+    static func status(for task: Task, field: String) -> String {
         if let statusField = task.fieldValues.first(where: { $0.field.name == field }) {
             if case let .selection(values) = statusField.value {
                 return values.first ?? "Unknown"
@@ -53,17 +45,17 @@ class CardViewModel : ObservableObject
         return "Unknown"
     }
 
-    static func getField(_ type: FieldType, named: String , _ task : Task) -> FieldDataValue? {
+    static func getField(_ type: FieldType, named: String, _ task: Task) -> FieldDataValue? {
         return task.fieldValues.first { $0.field.name == named && $0.field.type == type }?.value
     }
-    
-    static func addTask(fields : [Field] , tasks : inout [Task]) {
+
+    static func addTask(fields: [Field], tasks: inout [Task]) {
         let newFieldValues = fields.map { field in
             FieldValue(field: field, value: defaultValue(for: field.type))
         }
         tasks.append(Task(fieldValues: newFieldValues))
     }
-    
+
     static func defaultValue(for type: FieldType) -> FieldDataValue {
         switch type {
         case .text: return .text("")
@@ -71,7 +63,7 @@ class CardViewModel : ObservableObject
         case .boolean: return .boolean(false)
         case .date: return .date(Date())
         case .url: return .url("")
-        case .selection: return .selection([]) // порожній масив
+        case .selection: return .selection([])
         }
     }
 
@@ -80,10 +72,9 @@ class CardViewModel : ObservableObject
         case .text(let str): return str
         case .number(let num): return String(num)
         case .boolean(let bool): return bool ? "✅" : "❌"
-        case .date(let date): return CardViewModel.dateFormatter.string(from: date)
+        case .date(let date): return dateFormatter.string(from: date)
         case .url(let urlStr): return urlStr
         case .selection(let selections):
-           
             return selections.isEmpty ? "—" : selections.joined(separator: ", ")
         }
     }
@@ -94,57 +85,124 @@ class CardViewModel : ObservableObject
                 .font(.body)
                 .foregroundColor(.primary)
                 .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)                    
+                .cornerRadius(8)
             Spacer()
         }
     }
 
-    
     static func addFieldToCard(
-       name: String,
-       type: FieldType,
-       optionsString: String,
-       fields: Binding<[FieldValue]>
+        name: String,
+        type: FieldType,
+        optionsString: String,
+        fields: Binding<[FieldValue]>
     ) {
-       let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-       guard !trimmedName.isEmpty else { return }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
 
-       var options: [String] = []
-       if type == .selection {
-          options = optionsString
-             .split(separator: ",")
-             .map { $0.trimmingCharacters(in: .whitespaces) }
-             .filter { !$0.isEmpty }
-       }
+        var options: [String] = []
+        if type == .selection {
+            options = optionsString
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+        }
 
-       let field = Field(name: trimmedName, type: type, options: options)
-
-       let defaultValue: FieldDataValue
-       switch type {
-       case .text: defaultValue = .text("")
-       case .number: defaultValue = .number(0)
-       case .boolean: defaultValue = .boolean(false)
-       case .date: defaultValue = .date(Date())
-       case .url: defaultValue = .url("")
-       case .selection: defaultValue = .selection([])
-       }
-
-       let fieldValue = FieldValue(field: field, value: defaultValue)
-       fields.wrappedValue.append(fieldValue)
+        let field = Field(name: trimmedName, type: type, options: options)
+        let defaultValue = defaultValue(for: type)
+        let fieldValue = FieldValue(field: field, value: defaultValue)
+        fields.wrappedValue.append(fieldValue)
     }
 
-
-    
-    
     static func formatted(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
+        dateFormatter.string(from: date)
     }
-    static func deleteCard(_ tasks: inout [Task] , _ task : Task)  -> Void{
+
+    static func deleteCard(_ tasks: inout [Task], _ task: Task) {
         if let index = tasks.firstIndex(where: { $0.id == task.id }) {
             tasks.remove(at: index)
             print("Deleted")
         }
     }
+
+    static func filteredAndSortedTasksBinding(
+        base: Binding<[Task]>,
+        searchText: String,
+        sort: ((Task, Task) -> Bool)?,
+        filters: [UUID: FieldDataValue],
+        fields:[Field]
+    ) -> Binding<[Task]> {
+        Binding<[Task]>(
+            get: {
+                base.wrappedValue
+                    .filter { task in
+                        let matchesSearch = searchText.isEmpty || task.fieldValues.contains {
+                            CardViewModel.stringValue(for: $0.value).localizedCaseInsensitiveContains(searchText)
+                        }
+                        let matchesFilters = filters.allSatisfy { (fieldID, filterValue) in
+                            guard let fieldName = fields.first(where: { $0.id == fieldID })?.name else { return false }
+                            return task.fieldValues.contains {
+                                $0.field.name == fieldName && $0.value.matches(filterValue)
+                            }
+                        }
+                        return matchesSearch && matchesFilters
+                    }
+                    .sorted(by: sort ?? { _, _ in false })
+            },
+            set: { newTasks in
+                for task in newTasks {
+                    if let index = base.wrappedValue.firstIndex(where: { $0.id == task.id }) {
+                        base.wrappedValue[index] = task
+                    }
+                }
+            }
+        )
+    }
+    
+    static func createSortClosure(selectedSortField:FieldValue? ) -> ((Task, Task) -> Bool)? {
+        guard let sortField = selectedSortField?.field.name else { return nil }
+        
+        return { lhs, rhs in
+            guard
+                let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortField })?.value,
+                let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortField })?.value
+            else {
+                return false
+            }
+            
+            switch (lhsValue, rhsValue) {
+            case let (.text(a), .text(b)):
+                return a < b
+            case let (.number(a), .number(b)):
+                return a < b
+            case let (.date(a), .date(b)):
+                return a < b
+            case let (.selection(a), .selection(b)):
+                return (a.first ?? "") < (b.first ?? "")
+            default:
+                return false
+            }
+        }
+    }
 }
+
+extension FieldDataValue {
+    func matches(_ other: FieldDataValue) -> Bool {
+        switch (self, other) {
+        case let (.text(a), .text(b)):
+            return a.localizedCaseInsensitiveContains(b)
+        case let (.number(a), .number(b)):
+            return a == b
+        case let (.boolean(a), .boolean(b)):
+            return a == b
+        case let (.date(a), .date(b)):
+            return Calendar.current.isDate(a, inSameDayAs: b)
+        case let (.url(a), .url(b)):
+            return a == b
+        case let (.selection(taskValues), .selection(filterValues)):
+            return !Set(taskValues).intersection(filterValues).isEmpty
+        default:
+            return false
+        }
+    }
+}
+

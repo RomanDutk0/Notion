@@ -17,7 +17,7 @@ struct RowView: View {
                 let visibleFields = fields.filter { !hiddenFieldIDs.contains($0.id) }
                 ForEach(Array(visibleFields.enumerated()), id: \.element.id) { index, field in
                     cellContent(for: field)
-                        .frame(width: columnWidth, alignment: .center) // Центрування значення
+                        .frame(width: columnWidth, alignment: .center) 
 
                     if index < visibleFields.count - 1 {
                         Divider()
@@ -45,10 +45,11 @@ struct RowView: View {
     private func cellContent(for field: Field) -> some View {
         if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
             Text(CardViewModel.stringValue(for: fieldValue.value))
-                .multilineTextAlignment(.center) // Центрування тексту
+                .multilineTextAlignment(.center)
+            
         } else {
             Text("-")
-                .multilineTextAlignment(.center) // Центрування навіть якщо значення немає
+                .multilineTextAlignment(.center)
         }
     }
 
