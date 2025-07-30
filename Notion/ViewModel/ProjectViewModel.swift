@@ -58,7 +58,7 @@ class ProjectViewModel : ObservableObject
                 Task(fieldValues: [
                     FieldValue(
                         field: Field(name: "Name", type: .text),
-                        value: .text("🚀 Product Launch")
+                        value: .text("🚀 Product")
                     ),
                     FieldValue(
                         field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
@@ -70,7 +70,61 @@ class ProjectViewModel : ObservableObject
                     ),
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(30 * 30 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Product Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection(["In Progress"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["Done1"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection(["Done"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["In Progress1"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    )
+                ]),
+                Task(fieldValues: [
+                    FieldValue(
+                        field: Field(name: "Name", type: .text),
+                        value: .text("🚀 Product Launch")
+                    ),
+                    FieldValue(
+                        field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                        value: .selection(["In Progress"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "GO", type: .selection, options: ["In Progress1", "Done1"]),
+                        value: .selection(["In Progress1"])
+                    ),
+                    FieldValue(
+                        field: Field(name: "End Date", type: .date),
+                        value: .date(Date().addingTimeInterval(30 * 60 * 24 * 30))
                     )
                 ]),
                 Task(fieldValues: [

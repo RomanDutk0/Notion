@@ -187,8 +187,9 @@ struct TaskTreckerView: View {
                             CardViewModel.stringValue(for: $0.value).localizedCaseInsensitiveContains(searchText)
                         }
                         let matchesFilters = filters.allSatisfy { (fieldID, filterValue) in
-                            task.fieldValues.contains {
-                                $0.field.id == fieldID && $0.value.matches(filterValue)
+                            guard let fieldName = fields.first(where: { $0.id == fieldID })?.name else { return false }
+                            return task.fieldValues.contains {
+                                $0.field.name == fieldName && $0.value.matches(filterValue)
                             }
                         }
                         return matchesSearch && matchesFilters
@@ -230,11 +231,17 @@ extension FieldDataValue {
             return Calendar.current.isDate(a, inSameDayAs: b)
         case let (.url(a), .url(b)):
             return a == b
-        case let (.selection(a), .selection(b)):
-            return !Set(b).isDisjoint(with: a)
+        case let (.selection(taskValues), .selection(filterValues)):
+            // Перевірка: чи Є ХОЧА Б ОДИН збіг
+            return !Set(taskValues).intersection(filterValues).isEmpty
         default:
             return false
         }
     }
 }
+
+
+
+
+
 
