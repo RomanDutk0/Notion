@@ -2,7 +2,8 @@ import SwiftUI
 
 struct CardConstructorView: View {
     
-    @Binding var projects: [Project]
+    
+    @StateObject var projectModel = ProjectViewModel.getInstance()
     @State private var fields: [Field] = [
         Field(name: "Title", type: .text)
     ]
@@ -84,7 +85,7 @@ struct CardConstructorView: View {
                 .padding(.horizontal)
                 
                 Button {
-                    ProjectViewModel.saveProject(projects: &projects, fields: fields, projectIcon: projectIcon, projectName: projectName)
+                    projectModel.saveProject(projects: &projectModel.projects, fields: fields, projectIcon: projectIcon, projectName: projectName)
                 }label: {
                     Text("Save Project")
                         .bold()
@@ -129,7 +130,7 @@ struct CardConstructorView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        ProjectViewModel.addField(name: newFieldName, type: newFieldType, optionsString: newFieldOptions, fields: &fields)
+                        projectModel.addField(name: newFieldName, type: newFieldType, optionsString: newFieldOptions, fields: &fields)
                     }.disabled(newFieldName.isEmpty)
                 }
                 ToolbarItem(placement: .cancellationAction) {
@@ -144,10 +145,7 @@ struct CardConstructorView: View {
     
     
 struct CardConstructorView_Previews: PreviewProvider {
-    @State static var previewProjects: [Project] = []
-
     static var previews: some View {
-        CardConstructorView(projects: $previewProjects)
+        CardConstructorView()
     }
 }
-

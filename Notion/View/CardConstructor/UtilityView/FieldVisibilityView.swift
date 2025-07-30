@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct FieldVisibilityView: View {
-    let fields: [Field]
-    @Binding var hiddenFieldIDs: Set<UUID>
+    
     @Environment(\.dismiss) var dismiss
+    @State var fields: [Field]
+    @Binding var hiddenFieldIDs: Set<UUID>
+    
 
     var body: some View {
         NavigationView {
@@ -27,10 +29,10 @@ struct FieldVisibilityView: View {
                     }
                 }
             }
-            .navigationTitle("Вибір полів")
+            .navigationTitle("Select fields")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Готово") {
+                    Button("Done") {
                         dismiss()
                     }
                 }

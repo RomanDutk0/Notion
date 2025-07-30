@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CardView: View {
     
+    @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @Binding var tasks: [Task]
     @State private var showDetail = false
@@ -14,7 +15,7 @@ struct CardView: View {
         } label: {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(task.fieldValues.filter { !hiddenFieldIDs.contains($0.field.id) }) { fieldValue in
-                        fieldRow(fieldValue)
+                    cardModel.fieldRow(fieldValue)
                     }
                            
                 
@@ -30,9 +31,11 @@ struct CardView: View {
         }
         .sheet(isPresented: $showDetail) {
             TaskConstructorView(
-                task: $task,hiddenFieldIDs: $hiddenFieldIDs,
+                cardModel: cardModel,
+                task: $task,
+                hiddenFieldIDs: $hiddenFieldIDs,
                 onDelete: {
-                    CardViewModel.deleteCard(&tasks, task)
+                   cardModel.deleteCard(&tasks, task)
                 }
             )
 
@@ -41,26 +44,9 @@ struct CardView: View {
             return NSItemProvider(object: task.id.uuidString as NSString)
         }
     }
-    }
+}
     
-   
-    @ViewBuilder
-    private func fieldRow(_ fieldValue: FieldValue) -> some View {
-        switch fieldValue.value {
-        case .text(let text):
-            CardViewModel.labeledRow(fieldValue.field.name, text)
-        case .number(let number):
-            CardViewModel.labeledRow(fieldValue.field.name, String(number))
-        case .boolean(let flag):
-            CardViewModel.labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
-        case .date(let date):
-            CardViewModel.labeledRow(fieldValue.field.name, CardViewModel.formatted(date))
-        case .url(let url):
-                URLPreview(urlString: url)
-        case .selection(let option):
-            CardViewModel.labeledRow(fieldValue.field.name, option.joined(separator: ", "))
-        }
-    }
+
     
     
 
@@ -75,9 +61,10 @@ struct CardView: View {
             ])
         ]
         @State var hidden: Set<UUID> = []
-
+        @State var cardModel : CardViewModel = CardViewModel()
         var body: some View {
             CardView(
+                cardModel: cardModel,
                 task: $previewTasks[0],
                 tasks: $previewTasks,
                 hiddenFieldIDs: $hidden

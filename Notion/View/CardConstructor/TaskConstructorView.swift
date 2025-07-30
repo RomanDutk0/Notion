@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct TaskConstructorView: View {
+    
+    @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @State private var comment: String = ""
     @State private var subTasks: [SubTask] = [
@@ -19,13 +21,13 @@ struct TaskConstructorView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     HStack {
-                        if let emoji = CardViewModel.getField(.text, named: "Emoji", task)?.asText {
+                        if let emoji = cardModel.getField(.text, named: "Emoji", task)?.asText {
                             Text(emoji)
                                 .frame(width: 60, height: 60)
                                 .font(.system(size: 60, weight: .bold))
                         }
                         
-                        if let name = CardViewModel.getField(.text, named: "Name", task)?.asText {
+                        if let name = cardModel.getField(.text, named: "Name", task)?.asText {
                             Text(name)
                                 .font(.largeTitle)
                                 .bold()
@@ -114,6 +116,7 @@ struct TaskConstructorView: View {
             .background(Color(.systemBackground))
             .sheet(isPresented: $showAddFieldSheet) {
                 AddPropertyView(
+                    cardModel: cardModel,
                     task: $task,
                     showAddFieldSheet: $showAddFieldSheet
                 )
@@ -238,7 +241,11 @@ extension Binding where Value == FieldValue {
         @State var hiddenFields: Set<UUID> = []
 
         var body: some View {
+         
+            let cardModel = CardViewModel(task: $sampleTask)
+
             TaskConstructorView(
+                cardModel: cardModel,
                 task: $sampleTask,
                 hiddenFieldIDs: $hiddenFields,
                 onDelete: {

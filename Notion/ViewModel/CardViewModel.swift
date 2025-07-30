@@ -13,17 +13,22 @@ import SwiftUI
 @MainActor
 class CardViewModel: ObservableObject {
     
-    @Published var task: Task
+    @Binding var task: Task
     
-    init(task: Task) {
-        self.task = task
+  
+    convenience init() {
+        self.init(task: .constant(Task(fieldValues: [])))
     }
     
-    static func getTaskFields(_ task: Task) -> [Field] {
+    init(task : Binding<Task>) {
+        self._task = task
+    }
+    
+    func getTaskFields(_ task: Task) -> [Field] {
         task.fieldValues.map { $0.field }
     }
     
-    static func dateString(from date: Date) -> String {
+    func dateString(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
@@ -45,18 +50,18 @@ class CardViewModel: ObservableObject {
         return "Unknown"
     }
 
-    static func getField(_ type: FieldType, named: String, _ task: Task) -> FieldDataValue? {
+    func getField(_ type: FieldType, named: String, _ task: Task) -> FieldDataValue? {
         return task.fieldValues.first { $0.field.name == named && $0.field.type == type }?.value
     }
 
-    static func addTask(fields: [Field], tasks: inout [Task]) {
+    func addTask(fields: [Field], tasks: inout [Task]) {
         let newFieldValues = fields.map { field in
             FieldValue(field: field, value: defaultValue(for: field.type))
         }
         tasks.append(Task(fieldValues: newFieldValues))
     }
 
-    static func defaultValue(for type: FieldType) -> FieldDataValue {
+    func defaultValue(for type: FieldType) -> FieldDataValue {
         switch type {
         case .text: return .text("")
         case .number: return .number(0)
@@ -79,7 +84,7 @@ class CardViewModel: ObservableObject {
         }
     }
 
-    static func labeledRow(_ label: String, _ value: String) -> some View {
+    func labeledRow(_ label: String, _ value: String) -> some View {
         HStack {
             Text(value)
                 .font(.body)
@@ -90,7 +95,7 @@ class CardViewModel: ObservableObject {
         }
     }
 
-    static func addFieldToCard(
+    func addFieldToCard(
         name: String,
         type: FieldType,
         optionsString: String,
@@ -117,14 +122,14 @@ class CardViewModel: ObservableObject {
         dateFormatter.string(from: date)
     }
 
-    static func deleteCard(_ tasks: inout [Task], _ task: Task) {
+    func deleteCard(_ tasks: inout [Task], _ task: Task) {
         if let index = tasks.firstIndex(where: { $0.id == task.id }) {
             tasks.remove(at: index)
             print("Deleted")
         }
     }
 
-    static func filteredAndSortedTasksBinding(
+    func filteredAndSortedTasksBinding(
         base: Binding<[Task]>,
         searchText: String,
         sort: ((Task, Task) -> Bool)?,
@@ -158,7 +163,7 @@ class CardViewModel: ObservableObject {
         )
     }
     
-    static func createSortClosure(selectedSortField:FieldValue? ) -> ((Task, Task) -> Bool)? {
+    func createSortClosure(selectedSortField:FieldValue? ) -> ((Task, Task) -> Bool)? {
         guard let sortField = selectedSortField?.field.name else { return nil }
         
         return { lhs, rhs in
@@ -183,6 +188,26 @@ class CardViewModel: ObservableObject {
             }
         }
     }
+    @ViewBuilder
+    func fieldRow(_ fieldValue: FieldValue) -> some View {
+        switch fieldValue.value {
+        case .text(let text):
+            labeledRow(fieldValue.field.name, text)
+        case .number(let number):
+            labeledRow(fieldValue.field.name, String(number))
+        case .boolean(let flag):
+            labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
+        case .date(let date):
+            labeledRow(fieldValue.field.name, CardViewModel.formatted(date))
+        case .url(let url):
+                URLPreview(urlString: url)
+        case .selection(let option):
+            labeledRow(fieldValue.field.name, option.joined(separator: ", "))
+        }
+    }
+    
+    
+    
 }
 
 extension FieldDataValue {
@@ -204,5 +229,7 @@ extension FieldDataValue {
             return false
         }
     }
+    
+    
 }
 

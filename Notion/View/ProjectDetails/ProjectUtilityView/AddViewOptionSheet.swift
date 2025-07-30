@@ -7,41 +7,43 @@
 import SwiftUI
 
 struct AddViewOptionSheet: View {
+    
+    
     @Environment(\.dismiss) var dismiss
     @State private var title: String = ""
     @State private var icon: String = "square.grid.2x2"
     @State private var type: ViewType = .board
-    @State private var groupByFieldText: String = "" // ← замість optional binding
+    @State private var groupByFieldText: String = ""
 
     var onAdd: (ViewOption) -> Void
 
     var body: some View {
         NavigationView {
             Form {
-                TextField("Назва перегляду", text: $title)
-                TextField("SF Symbol іконка", text: $icon)
-                Picker("Тип перегляду", selection: $type) {
+                TextField("View name", text: $title)
+                TextField("SF Symbol ", text: $icon)
+                Picker("View type", selection: $type) {
                     Text("Board").tag(ViewType.board)
                     Text("Table").tag(ViewType.table)
                 }
                 if type == .board {
-                    TextField("Групувати за полем", text: $groupByFieldText)
+                    TextField("Group by field", text: $groupByFieldText)
                 }
             }
-            .navigationTitle("Нова опція перегляду")
+            .navigationTitle("New view option")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Скасувати") {
+                    Button("Сancel") {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Додати") {
+                    Button("Add") {
                         guard !title.trimmingCharacters(in: .whitespaces).isEmpty else { return }
 
                         let groupValue = type == .board && !groupByFieldText.trimmingCharacters(in: .whitespaces).isEmpty
                             ? groupByFieldText
-                            : nil
+                            : ""
 
                         let newOption = ViewOption(
                             title: title,

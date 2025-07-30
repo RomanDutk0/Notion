@@ -7,22 +7,13 @@
 
 import SwiftUI
 
-//
-//  ProjectsListView.swift
-//  Notion
-//
-//  Created by Roman on 05.07.2025.
-//
-
-import SwiftUI
-
 struct ProjectsListView: View {
     
     @State private var showDetail = false
     @State private var showDeleteConfirmation = false
     @State private var projectToDelete: Project? = nil
-
-    @ObservedObject var projectModel : ProjectViewModel
+    @StateObject var projectModel = ProjectViewModel.getInstance()
+    
     
     var body: some View {
         NavigationView {
@@ -58,7 +49,7 @@ struct ProjectsListView: View {
                             .padding(.trailing, 10)
                     }
                     .sheet(isPresented: $showDetail) {
-                        CardConstructorView(projects: $projectModel.projects)
+                        CardConstructorView()
                     }
                 }
                 VStack{

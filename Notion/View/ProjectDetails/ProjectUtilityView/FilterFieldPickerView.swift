@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct FilterFieldPickerView: View {
+    
     let fields: [Field]
     @Binding var selectedFilterValues: [UUID: [String]]
     @Binding var isPresented: Bool
@@ -44,7 +45,6 @@ struct FilterFieldPickerView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Готово") {
                         isPresented = false
-                        // Обробка selectedFilterValues поза межами цього в'ю
                     }
                 }
             }

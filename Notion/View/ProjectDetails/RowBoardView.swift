@@ -1,11 +1,12 @@
 import SwiftUI
 
-struct ProjectsTableView: View {
+struct RowBoardView: View {
     
     @State var fields: [Field]
     @Binding var tasks: [Task]
     @Binding var hiddenFieldIDs: Set<UUID>
     @State private var showAddFieldSheet = false
+    @StateObject var cardModel  = CardViewModel()
     
     let columnWidth: CGFloat = 140  
     var body: some View {
@@ -62,6 +63,7 @@ struct ProjectsTableView: View {
                         LazyVStack(spacing: 0) {
                             ForEach($tasks) { $task in
                                 RowView(
+                                    cardModel : cardModel,
                                     task: $task,
                                     tasks: $tasks,
                                     fields: fields,
@@ -89,8 +91,7 @@ struct ProjectsTableView: View {
     }
 }
 
-
-struct ProjectsTableView_Previews: PreviewProvider {
+struct RowBoardView_Previews: PreviewProvider {
     @State static var tasks: [Task] = [
         Task(fieldValues: [
             FieldValue(field: Field(name: "Title", type: .text), value: .text("🚀 Launch App")),
@@ -105,14 +106,33 @@ struct ProjectsTableView_Previews: PreviewProvider {
     @State static var hiddenFieldIDs: Set<UUID> = []
 
     static var previews: some View {
-        ProjectsTableView(
-            fields: [
-                Field(name: "Title", type: .text),
-                Field(name: "Status", type: .text)
-            ],
-            tasks: $tasks,
-            hiddenFieldIDs: $hiddenFieldIDs
-        )
-        .previewLayout(.sizeThatFits)
+        PreviewWrapper()
+    }
+
+    struct PreviewWrapper: View {
+        @State var localTasks = tasks
+        @State var hidden: Set<UUID> = hiddenFieldIDs
+
+        var body: some View {
+            let dummyBinding = Binding<Task>(
+                get: { localTasks.first ?? Task(fieldValues: []) },
+                set: { updated in
+                    if let i = localTasks.firstIndex(where: { $0.id == updated.id }) {
+                        localTasks[i] = updated
+                    }
+                }
+            )
+            let dummyCardModel = CardViewModel(task: dummyBinding)
+
+            return RowBoardView(
+                fields: [
+                    Field(name: "Title", type: .text),
+                    Field(name: "Status", type: .text)
+                ],
+                tasks: $localTasks,
+                hiddenFieldIDs: $hidden,
+                cardModel: dummyCardModel
+            )
+        }
     }
 }

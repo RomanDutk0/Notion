@@ -7,6 +7,10 @@
 
 import SwiftUI
 struct ProjectRow: View {
+    
+    
+    @ObservedObject var projectModel = ProjectViewModel.getInstance()
+    @StateObject var cardModel : CardViewModel = CardViewModel()
     @Binding var project: Project
     var onRequestDelete: () -> Void
     @State private var navigate = false
@@ -44,7 +48,7 @@ struct ProjectRow: View {
                     NavigationLink(
                         destination: TaskTreckerView(
                             project: $project,
-                            fields: ProjectViewModel.getAllFields(project)
+                            fields: projectModel.getAllFields(project), cardModel: cardModel
                         ),
                         isActive: $navigate
                     ) {

@@ -24,7 +24,7 @@ struct Project: Identifiable {
         self.templateOfFieldValues = template
         self.viewOptions = [
             ViewOption(title: "By Status", icon: "arrow.right", type: .board, groupByFieldName: "Status"),
-            ViewOption(title: "All tasks", icon: "star", type: .table, groupByFieldName: nil),
+            ViewOption(title: "All tasks", icon: "star", type: .table, groupByFieldName: "Status"),
         ]
     }
     init(id: UUID = UUID(), icon: String, projectName: String, taskCards: [Task] , template : [FieldValue] , viewOptions : [ViewOption]) {

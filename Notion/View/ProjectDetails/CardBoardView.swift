@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CardBoard: View {
     
+    @StateObject var cardModel  = CardViewModel()
     @Binding var tasks: [Task]
     @Binding   var selectedViewOption: ViewOption
     var fields: [Field]
@@ -24,8 +25,8 @@ struct CardBoard: View {
             HStack(alignment: .top, spacing: 32) {
                 ForEach(uniqueStatuses, id: \.self) { status in
                     
-                    
                         TaskCardView(
+                            cardModel: cardModel,
                             cardStatus: status,
                             fields: fields,
                             allTasks:  $tasks ,
@@ -58,49 +59,57 @@ struct CardBoard: View {
     struct PreviewWrapper: View {
         @State var tasksState: [Task] = [
             Task(fieldValues: [
-                FieldValue(field: fields[0], value: .text("🚀")),
-                FieldValue(field: fields[1], value: .text("Product Launch")),
-                FieldValue(field: fields[2], value: .selection(["In Progress"])),
-                FieldValue(field: fields[3], value: .selection(["High"]))
+                FieldValue(field: PreviewWrapper.fields[0], value: .text("🚀")),
+                FieldValue(field: PreviewWrapper.fields[1], value: .text("Product Launch")),
+                FieldValue(field: PreviewWrapper.fields[2], value: .selection(["In Progress"])),
+                FieldValue(field: PreviewWrapper.fields[3], value: .selection(["High"]))
             ]),
             Task(fieldValues: [
-                FieldValue(field: fields[0], value: .text("📝")),
-                FieldValue(field: fields[1], value: .text("Write Documentation")),
-                FieldValue(field: fields[2], value: .selection(["Not Started"])),
-                FieldValue(field: fields[3], value: .selection(["Medium"]))
+                FieldValue(field: PreviewWrapper.fields[0], value: .text("📝")),
+                FieldValue(field: PreviewWrapper.fields[1], value: .text("Write Documentation")),
+                FieldValue(field: PreviewWrapper.fields[2], value: .selection(["Not Started"])),
+                FieldValue(field: PreviewWrapper.fields[3], value: .selection(["Medium"]))
             ]),
             Task(fieldValues: [
-                FieldValue(field: fields[0], value: .text("🎨")),
-                FieldValue(field: fields[1], value: .text("Design New Logo")),
-                FieldValue(field: fields[2], value: .selection(["Completed"])),
-                FieldValue(field: fields[3], value: .selection(["Low"]))
+                FieldValue(field: PreviewWrapper.fields[0], value: .text("🎨")),
+                FieldValue(field: PreviewWrapper.fields[1], value: .text("Design New Logo")),
+                FieldValue(field: PreviewWrapper.fields[2], value: .selection(["Completed"])),
+                FieldValue(field: PreviewWrapper.fields[3], value: .selection(["Low"]))
             ]),
             Task(fieldValues: [
-                FieldValue(field: fields[0], value: .text("📣")),
-                FieldValue(field: fields[1], value: .text("Marketing Campaign")),
-                FieldValue(field: fields[2], value: .selection(["Planning"])),
-                FieldValue(field: fields[3], value: .selection(["High"]))
+                FieldValue(field: PreviewWrapper.fields[0], value: .text("📣")),
+                FieldValue(field: PreviewWrapper.fields[1], value: .text("Marketing Campaign")),
+                FieldValue(field: PreviewWrapper.fields[2], value: .selection(["Planning"])),
+                FieldValue(field: PreviewWrapper.fields[3], value: .selection(["High"]))
             ]),
             Task(fieldValues: [
-                FieldValue(field: fields[0], value: .text("🔍")),
-                FieldValue(field: fields[1], value: .text("QA Testing")),
-                FieldValue(field: fields[2], value: .selection(["In Progress"])),
-                FieldValue(field: fields[3], value: .selection(["Critical"]))
+                FieldValue(field: PreviewWrapper.fields[0], value: .text("🔍")),
+                FieldValue(field: PreviewWrapper.fields[1], value: .text("QA Testing")),
+                FieldValue(field: PreviewWrapper.fields[2], value: .selection(["In Progress"])),
+                FieldValue(field: PreviewWrapper.fields[3], value: .selection(["Critical"]))
             ])
         ]
+        
         @State var hiddenFieldIDs: Set<UUID> = []
-        @State var selectedViewOption = ViewOption(title: "By Status", icon: "arrow.right", type: .board, groupByFieldName: "Status")
-
+        @State var selectedViewOption = ViewOption(
+            title: "By Status",
+            icon: "arrow.right",
+            type: .board,
+            groupByFieldName: "Status"
+        )
+        
         static let fields = [
             Field(name: "Emoji", type: .text),
             Field(name: "Name", type: .text),
             Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Completed", "Planning"]),
             Field(name: "Priority", type: .selection, options: ["High", "Medium", "Low", "Critical"])
         ]
-        @State var txt = ""
         
         var body: some View {
+            let cardModel = CardViewModel(task: $tasksState[0]) 
+
             CardBoard(
+                cardModel: cardModel,
                 tasks: $tasksState,
                 selectedViewOption: $selectedViewOption,
                 fields: Self.fields,

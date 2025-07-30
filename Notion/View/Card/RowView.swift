@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RowView: View {
     
+    @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @Binding var tasks: [Task]
     var fields: [Field]
@@ -16,7 +17,7 @@ struct RowView: View {
             HStack(spacing: 0) {
                 let visibleFields = fields.filter { !hiddenFieldIDs.contains($0.id) }
                 ForEach(Array(visibleFields.enumerated()), id: \.element.id) { index, field in
-                    cellContent(for: field)
+                   cellContent(for: field)
                         .frame(width: columnWidth, alignment: .center) 
 
                     if index < visibleFields.count - 1 {
@@ -32,32 +33,27 @@ struct RowView: View {
         .foregroundColor(.black)
         .sheet(isPresented: $showDetail) {
             TaskConstructorView(
+                cardModel: cardModel,
                 task: $task,
                 hiddenFieldIDs: $hiddenFieldIDs,
                 onDelete: {
-                    CardViewModel.deleteCard(&tasks, task)
+                    cardModel.deleteCard(&tasks, task)
                 }
             )
         }
     }
-
     @ViewBuilder
-    private func cellContent(for field: Field) -> some View {
-        if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
-            Text(CardViewModel.stringValue(for: fieldValue.value))
-                .multilineTextAlignment(.center)
-            
-        } else {
-            Text("-")
-                .multilineTextAlignment(.center)
-        }
-    }
+       private func cellContent(for field: Field) -> some View {
+           if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
+               Text(CardViewModel.stringValue(for: fieldValue.value))
+                   .multilineTextAlignment(.center)
+               
+           } else {
+               Text("-")
+                   .multilineTextAlignment(.center)
+           }
+       }
 
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter
-    }
 }
 
 
@@ -92,6 +88,7 @@ struct RowView: View {
         
         var body: some View {
             RowView(
+                cardModel: CardViewModel(task: $tasks[0]),
                 task: $tasks[0],
                 tasks: $tasks,
                 fields: [
@@ -106,6 +103,6 @@ struct RowView: View {
             )
         }
     }
-    
+
     return RowViewPreviewWrapper()
 }

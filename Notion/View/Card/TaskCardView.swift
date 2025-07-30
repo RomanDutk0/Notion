@@ -5,11 +5,13 @@ import UniformTypeIdentifiers
 struct TaskCardView: View {
     
     @ObservedObject var projectModel = ProjectViewModel.getInstance()
+    @ObservedObject var cardModel : CardViewModel
     let cardStatus: String
     var fields: [Field]
     @Binding var allTasks: [Task]
     @Binding var hiddenFieldIDs: Set<UUID>
     @Binding  var selectedViewOption: ViewOption
+    
     var body: some View {
         let filteredTasks = allTasks.filter { CardViewModel.status(for: $0, field: selectedViewOption.groupByFieldName!) == cardStatus }
 
@@ -22,19 +24,23 @@ struct TaskCardView: View {
             }
 
             ForEach(filteredTasks) { task in
-                CardView(
-                    task: Binding(
-                        get: { task },
-                        set: { updated in
-                            if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
-                                allTasks[i] = updated
-                            }
-                        }
-                    ),
-                    tasks: $allTasks,
-                    hiddenFieldIDs: $hiddenFieldIDs
-                )
-            }
+                           CardView(
+                            cardModel: cardModel,
+                               task: Binding(
+                                   get: { task },
+                                   set: { updated in
+                                       if let i = allTasks.firstIndex(where: { $0.id == updated.id }) {
+                                           allTasks[i] = updated
+                                       }
+                                   }
+                               ),
+                               tasks: $allTasks,
+                               hiddenFieldIDs: $hiddenFieldIDs
+                           )
+                       }
+
+
+
 
 
             Button {

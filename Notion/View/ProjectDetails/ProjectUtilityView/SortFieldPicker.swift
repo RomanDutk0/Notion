@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SortFieldPicker: View {
+    
     let fields: [FieldValue]
     @Binding var selectedSortField: FieldValue?
     @Binding var isPresented: Bool

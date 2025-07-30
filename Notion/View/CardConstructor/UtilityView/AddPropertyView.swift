@@ -2,13 +2,17 @@ import SwiftUI
 
 struct AddPropertyView: View {
     
+    
     @State private var newFieldName: String = ""
     @State private var newFieldType: FieldType = .text
     @State private var newFieldOptions: String = ""
+
+    @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @Binding var showAddFieldSheet: Bool
     
     
+
     var body: some View {
         NavigationView {
             Form {
@@ -57,10 +61,12 @@ struct AddPropertyView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        CardViewModel.addFieldToCard(name: newFieldName,
-                                                  type: newFieldType,
-                                                  optionsString: newFieldOptions,
-                                                     fields: $task.fieldValues)
+                        cardModel.addFieldToCard(
+                            name: newFieldName,
+                            type: newFieldType,
+                            optionsString: newFieldOptions,
+                            fields: $task.fieldValues)
+                        
                         showAddFieldSheet = false
                     }.disabled(newFieldName.isEmpty)
                 }
@@ -74,25 +80,35 @@ struct AddPropertyView: View {
     }
 }
 
-
 #Preview {
-    AddPropertyView(
-        task: .constant(
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("🚀 Product Launch")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
-                    value: .selection(["In Progress"])
-                ),
-                FieldValue(
-                    field: Field(name: "End Date", type: .date),
-                    value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
-                )
-            ])
-        ),
-        showAddFieldSheet: .constant(true)
-    )
+    struct AddPropertyPreviewWrapper: View {
+        @State var showSheet = true
+        @State var previewTask = Task(fieldValues: [
+            FieldValue(
+                field: Field(name: "Name", type: .text),
+                value: .text("🚀 Product Launch")
+            ),
+            FieldValue(
+                field: Field(name: "Status", type: .selection, options: ["In Progress", "Done"]),
+                value: .selection(["In Progress"])
+            ),
+            FieldValue(
+                field: Field(name: "End Date", type: .date),
+                value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+            )
+        ])
+
+        var body: some View {
+            let cardModel = CardViewModel(task: $previewTask)
+
+            return AddPropertyView(
+                cardModel: cardModel,
+                task: $previewTask,
+                showAddFieldSheet: $showSheet
+                 
+            )
+        }
+    }
+
+    return AddPropertyPreviewWrapper()
 }

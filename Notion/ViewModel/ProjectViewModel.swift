@@ -243,11 +243,11 @@ class ProjectViewModel : ObservableObject
            return shared
        }
     
-    static func numberOfCards(project : Project)-> Int{
+    func numberOfCards(project : Project)-> Int{
         return project.taskCards.count
     }
     
-    static func getAllFields(_ project : Project) -> [Field] {
+    func getAllFields(_ project : Project) -> [Field] {
            var projectFields: [Field] = []
            
             guard
@@ -264,12 +264,7 @@ class ProjectViewModel : ObservableObject
        }
        
     
-    func setProjectFields()
-    {
-    
-    }
-    
-    static  func addField(
+    func addField(
         name: String,
         type: FieldType,
         optionsString: String,
@@ -295,7 +290,7 @@ class ProjectViewModel : ObservableObject
     }
 
     
-    static func saveProject(projects: inout [Project], fields: [Field], projectIcon: String, projectName: String) {
+    func saveProject(projects: inout [Project], fields: [Field], projectIcon: String, projectName: String) {
         let templateFieldValues: [FieldValue] = fields.map { field in
             let value: FieldDataValue
             switch field.type {
@@ -317,16 +312,13 @@ class ProjectViewModel : ObservableObject
 
 
         let newTask = Task(fieldValues: templateFieldValues)
-
         let newProject = Project(icon: projectIcon, projectName: projectName, taskCards: [newTask], template: templateFieldValues)
-
         projects.append(newProject)
-
         print("✅ Project added. Total projects: \(projects.count)")
     }
 
     
-    static func deleteProject(_ projects: inout [Project] , _ project : Project) {
+    func deleteProject(_ projects: inout [Project] , _ project : Project) {
         if let index = projects.firstIndex(where: { $0.id == project.id }) {
             projects.remove(at: index)
             print("Deleted")
@@ -343,8 +335,6 @@ class ProjectViewModel : ObservableObject
             return nil
         }
 
-
-    
 }
 
 

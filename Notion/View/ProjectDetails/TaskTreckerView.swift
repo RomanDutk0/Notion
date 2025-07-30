@@ -9,7 +9,7 @@ struct TaskTreckerView: View {
     
     @Binding var project: Project
     var fields: [Field]
-    
+    @StateObject var cardModel  = CardViewModel()
     @State private var selectedFilter = "All tasks"
     @State private var selectedFilterImage  = "arrow.right"
     @State private var hiddenFieldIDs = Set<UUID>()
@@ -24,6 +24,8 @@ struct TaskTreckerView: View {
     @State private var showFilterMenu = false
     @State private var filterValues: [UUID: FieldDataValue] = [:]
     @State private var filterSelectionValues: [UUID: [String]] = [:]
+   
+
     
     var body: some View {
         VStack {
@@ -142,10 +144,10 @@ struct TaskTreckerView: View {
                 switch selectedViewOption.type {
                 case .board:
                     CardBoard(
-                        tasks: CardViewModel.filteredAndSortedTasksBinding(
+                        tasks: cardModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: CardViewModel.createSortClosure(selectedSortField: selectedSortField),
+                            sort: cardModel.createSortClosure(selectedSortField: selectedSortField),
                             filters: filterValues,
                             fields: fields
                         ),
@@ -155,12 +157,12 @@ struct TaskTreckerView: View {
                     )
                     
                 case .table:
-                    ProjectsTableView(
+                    RowBoardView(
                         fields: fields,
-                        tasks: CardViewModel.filteredAndSortedTasksBinding(
+                        tasks: cardModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: CardViewModel.createSortClosure(selectedSortField: selectedSortField),
+                            sort: cardModel.createSortClosure(selectedSortField: selectedSortField),
                             filters: filterValues,
                             fields: fields
                         ),
