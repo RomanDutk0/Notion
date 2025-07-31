@@ -8,87 +8,86 @@
 import SwiftUI
 
 struct ProjectsListView: View {
-    
-    @State private var showDetail = false
-    @State private var showDeleteConfirmation = false
-    @State private var projectToDelete: Project? = nil
-    @StateObject var projectModel = ProjectViewModel.getInstance()
-    
-    
-    var body: some View {
-        NavigationView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Jump back in")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        JumpCard(title: "Projects", icon: "arrow.2.circlepath")
-                        JumpCard(title: "Quarterly sales planning", icon: "book.closed")
-                        JumpCard(title: "Tasks", icon: "checkmark.circle")
-                    }
-                    .padding(.horizontal)
-                }
-                
-                HStack {
-                    Text("Private")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal)
-                    Spacer()
-                    Button {
-                        showDetail = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .padding(10)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .padding(.trailing, 10)
-                    }
-                    .sheet(isPresented: $showDetail) {
-                        CardConstructorView()
-                    }
-                }
-                VStack{
-                    List {
-                        ForEach($projectModel.projects) { $project in
-                            ProjectRow(project: $project) {
-                                projectToDelete = project
-                                showDeleteConfirmation = true
-                            }
-                            .listRowSeparator(.hidden)
-                        }
-                        .onMove(perform: moveProject)
-                    }
-                } 
-                .listStyle(.plain)
-                .confirmationDialog("Are you sure you want to delete this project?", isPresented: $showDeleteConfirmation) {
-                    Button("Delete", role: .destructive) {
-                        if let project = projectToDelete,
-                           let index = projectModel.projects.firstIndex(where: { $0.id == project.id }) {
-                            projectModel.projects.remove(at: index)
-                        }
-                    }
-                    Button("Cancel", role: .cancel) {}
-                }
 
+  @State private var showDetail = false
+  @State private var showDeleteConfirmation = false
+  @State private var projectToDelete: Project? = nil
+  @StateObject var projectModel = ProjectViewModel.getInstance()
+
+  var body: some View {
+    NavigationView {
+      VStack(alignment: .leading, spacing: 20) {
+        Text("Jump back in")
+          .font(.title2)
+          .fontWeight(.semibold)
+          .padding(.horizontal)
+
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: 16) {
+            JumpCard(title: "Projects", icon: "arrow.2.circlepath")
+            JumpCard(title: "Quarterly sales planning", icon: "book.closed")
+            JumpCard(title: "Tasks", icon: "checkmark.circle")
+          }
+          .padding(.horizontal)
+        }
+
+        HStack {
+          Text("Private")
+            .font(.title3)
+            .fontWeight(.semibold)
+            .padding(.horizontal)
+          Spacer()
+          Button {
+            showDetail = true
+          } label: {
+            Image(systemName: "plus")
+              .padding(10)
+              .background(Color.blue)
+              .foregroundColor(.white)
+              .cornerRadius(10)
+              .padding(.trailing, 10)
+          }
+          .sheet(isPresented: $showDetail) {
+            CardConstructorView()
+          }
+        }
+        VStack {
+          List {
+            ForEach($projectModel.projects) { $project in
+              ProjectRow(project: $project) {
+                projectToDelete = project
+                showDeleteConfirmation = true
+              }
+              .listRowSeparator(.hidden)
             }
-            .navigationTitle("Dashboard")
+            .onMove(perform: moveProject)
+          }
         }
+        .listStyle(.plain)
+        .confirmationDialog(
+          "Are you sure you want to delete this project?", isPresented: $showDeleteConfirmation
+        ) {
+          Button("Delete", role: .destructive) {
+            if let project = projectToDelete,
+              let index = projectModel.projects.firstIndex(where: { $0.id == project.id })
+            {
+              projectModel.projects.remove(at: index)
+            }
+          }
+          Button("Cancel", role: .cancel) {}
+        }
+
+      }
+      .navigationTitle("Dashboard")
     }
-    private func moveProject(from source: IndexSet, to destination: Int) {
-            projectModel.projects.move(fromOffsets: source, toOffset: destination)
-        }
-    
+  }
+  private func moveProject(from source: IndexSet, to destination: Int) {
+    projectModel.projects.move(fromOffsets: source, toOffset: destination)
+  }
+
 }
 struct ProjectsListView_Previews: PreviewProvider {
-    static var previews: some View {
-        //ProjectsListView()
-    }
+  static var previews: some View {
+    //ProjectsListView()
+  }
 }
-
-
-

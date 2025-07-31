@@ -7,12 +7,11 @@
 
 import Foundation
 
-struct Task: Identifiable  {
-    let id = UUID()
-    var fieldValues: [FieldValue]
-    
-    
-    func value(for field: Field) -> FieldValue? {
-            fieldValues.first { $0.field.id == field.id }
-        }
+struct Task: Identifiable {
+  let id = UUID()
+  var fieldValues: [FieldValue]
+
+  func value(for field: Field) -> FieldValue? {
+    fieldValues.first { $0.field.id == field.id }
+  }
 }
