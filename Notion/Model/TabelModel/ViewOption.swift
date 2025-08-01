@@ -19,4 +19,14 @@ struct ViewOption: Identifiable {
     let icon: String
     let type: ViewType
     let groupByFieldName: String?
+    var selectedSortField: FieldValue?
+    var sortDirection: SortDirection = .ascending
+    var filterValues: [UUID: FieldDataValue] = [:]
+    var hiddenFieldIDs = Set<UUID>()
 }
+
+enum SortDirection {
+    case ascending
+    case descending
+}
+

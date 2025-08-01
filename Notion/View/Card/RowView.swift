@@ -1,14 +1,13 @@
 import SwiftUI
 
 struct RowView: View {
-    
-    @ObservedObject var cardModel : CardViewModel
+    @ObservedObject var cardModel: CardViewModel
     @Binding var task: Task
     @Binding var tasks: [Task]
     var fields: [Field]
-    @State private var showDetail = false
     @Binding var hiddenFieldIDs: Set<UUID>
     let columnWidth: CGFloat
+    @State private var showDetail = false
 
     var body: some View {
         Button {
@@ -16,21 +15,27 @@ struct RowView: View {
         } label: {
             HStack(spacing: 0) {
                 let visibleFields = fields.filter { !hiddenFieldIDs.contains($0.id) }
+
                 ForEach(Array(visibleFields.enumerated()), id: \.element.id) { index, field in
-                   cellContent(for: field)
-                        .frame(width: columnWidth, alignment: .center) 
+                    cellContent(for: field)
+                        .frame(width: columnWidth, height: 50)
+                        .padding(.horizontal, 8)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 0)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
 
                     if index < visibleFields.count - 1 {
                         Divider()
                             .frame(height: 40)
+                            .background(Color.gray.opacity(0.3))
                     }
                 }
             }
-            .font(.title3)
-            .frame(height: 60)
-            .padding(.horizontal, 24)
+            .background(Color.white)
         }
-        .foregroundColor(.black)
+        .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showDetail) {
             TaskConstructorView(
                 cardModel: cardModel,
@@ -42,67 +47,46 @@ struct RowView: View {
             )
         }
     }
+
     @ViewBuilder
-       private func cellContent(for field: Field) -> some View {
-           if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
-               Text(CardViewModel.stringValue(for: fieldValue.value))
-                   .multilineTextAlignment(.center)
-               
-           } else {
-               Text("-")
-                   .multilineTextAlignment(.center)
-           }
-       }
+    private func cellContent(for field: Field) -> some View {
+        if let fieldValue = task.fieldValues.first(where: { $0.field.name == field.name }) {
+            switch fieldValue.value {
+            case .text(let text):
+                Text(text)
+                    .font(.body)
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-}
+            case .selection(let options):
+                if let option = options.first {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 8, height: 8)
+                        Text(option)
+                            .font(.footnote)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.1))
+                            .foregroundColor(Color.blue)
+                            .clipShape(Capsule())
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text("-")
+                        .foregroundColor(.gray)
+                }
 
-
-#Preview {
-    struct RowViewPreviewWrapper: View {
-        @State var tasks: [Task] = [
-            Task(fieldValues: [
-                FieldValue(
-                    field: Field(name: "Name", type: .text),
-                    value: .text("🚀 Product Launch")
-                ),
-                FieldValue(
-                    field: Field(name: "Status", type: .selection),
-                    value: .selection(["In Progress"])
-                ),
-                FieldValue(
-                    field: Field(name: "End date", type: .date),
-                    value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
-                ),
-                FieldValue(
-                    field: Field(name: "Priority", type: .selection),
-                    value: .selection(["High"])
-                ),
-                FieldValue(
-                    field: Field(name: "Start date", type: .date),
-                    value: .date(Date())
-                )
-            ])
-        ]
-        
-        @State var hiddenFieldIDs: Set<UUID> = []
-        
-        var body: some View {
-            RowView(
-                cardModel: CardViewModel(task: $tasks[0]),
-                task: $tasks[0],
-                tasks: $tasks,
-                fields: [
-                    Field(name: "Name", type: .text),
-                    Field(name: "Status", type: .selection),
-                    Field(name: "End date", type: .date),
-                    Field(name: "Priority", type: .selection),
-                    Field(name: "Start date", type: .date)
-                ],
-                hiddenFieldIDs: $hiddenFieldIDs,
-                columnWidth: 140
-            )
+            default:
+                Text(CardViewModel.stringValue(for: fieldValue.value))
+                    .lineLimit(1)
+                    .foregroundColor(.black)
+            }
+        } else {
+            Text("-")
+                .foregroundColor(.gray)
         }
     }
-
-    return RowViewPreviewWrapper()
 }

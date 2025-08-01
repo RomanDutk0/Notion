@@ -63,11 +63,11 @@ class CardViewModel: ObservableObject {
 
     func defaultValue(for type: FieldType) -> FieldDataValue {
         switch type {
-        case .text: return .text("")
+        case .text: return .text(" - ")
         case .number: return .number(0)
         case .boolean: return .boolean(false)
         case .date: return .date(Date())
-        case .url: return .url("")
+        case .url: return .url(" - ")
         case .selection: return .selection([])
         }
     }
@@ -116,11 +116,19 @@ class CardViewModel: ObservableObject {
         }
 
         let field = Field(name: trimmedName, type: type, options: options)
-        let defaultValue = defaultValue(for: type)
-        let fieldValue = FieldValue(field: field, value: defaultValue)
+
+        let initialValue: FieldDataValue
+        if type == .selection, let first = options.first {
+            initialValue = .selection([first])
+        } else {
+            initialValue = defaultValue(for: type) 
+        }
+
+        let fieldValue = FieldValue(field: field, value: initialValue)
         fields.wrappedValue.append(fieldValue)
     }
 
+    
     static func formatted(_ date: Date) -> String {
         dateFormatter.string(from: date)
     }
@@ -166,31 +174,38 @@ class CardViewModel: ObservableObject {
         )
     }
     
-    func createSortClosure(selectedSortField:FieldValue? ) -> ((Task, Task) -> Bool)? {
-        guard let sortField = selectedSortField?.field.name else { return nil }
-        
+    func createSortClosure(selectedSortField: FieldValue?, direction: SortDirection) -> ((Task, Task) -> Bool)? {
+        guard let sortFieldName = selectedSortField?.field.name else {
+            return nil
+        }
+
         return { lhs, rhs in
             guard
-                let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortField })?.value,
-                let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortField })?.value
+                let lhsValue = lhs.fieldValues.first(where: { $0.field.name == sortFieldName })?.value,
+                let rhsValue = rhs.fieldValues.first(where: { $0.field.name == sortFieldName })?.value
             else {
                 return false
             }
-            
+
+            let comparisonResult: Bool
+
             switch (lhsValue, rhsValue) {
             case let (.text(a), .text(b)):
-                return a < b
+                comparisonResult = a < b
             case let (.number(a), .number(b)):
-                return a < b
+                comparisonResult = a < b
             case let (.date(a), .date(b)):
-                return a < b
+                comparisonResult = a < b
             case let (.selection(a), .selection(b)):
-                return (a.first ?? "") < (b.first ?? "")
+                comparisonResult = (a.first ?? "") < (b.first ?? "")
             default:
-                return false
+                comparisonResult = false
             }
+
+            return direction == .ascending ? comparisonResult : !comparisonResult
         }
     }
+
     
     @ViewBuilder
     func fieldRow(_ fieldValue: FieldValue) -> some View {

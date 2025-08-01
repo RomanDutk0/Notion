@@ -37,6 +37,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -55,6 +63,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -73,6 +89,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(30 * 30 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -91,6 +115,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -109,6 +141,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -127,6 +167,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(30 * 60 * 24 * 30))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ]),
                 Task(fieldValues: [
@@ -145,6 +193,14 @@ class ProjectViewModel : ObservableObject
                     FieldValue(
                         field: Field(name: "End Date", type: .date),
                         value: .date(Date().addingTimeInterval(60 * 60 * 24 * 10))
+                    ),
+                    FieldValue(
+                        field: Field(name: "Completed", type: .boolean),
+                        value: .boolean(false)
+                    ),
+                    FieldValue(
+                        field: Field(name: "Progress", type: .number),
+                        value: .number(40)
                     )
                 ])
             ] ,
@@ -152,7 +208,9 @@ class ProjectViewModel : ObservableObject
                         FieldValue(field: Field(name: "Name", type: .text), value: .text("")),
                         FieldValue(field: Field(name: "Status", type: .selection, options: ["Not Started", "In Progress", "Done"]), value: .selection(["Not Started"])),
                         FieldValue(field: Field(name: "GO", type: .selection, options: ["Not Started1", "In Progress1", "Done1"]), value: .selection(["Not Started1"])),
-                        FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date()))
+                        FieldValue(field: Field(name: "End Date", type: .date), value: .date(Date())),
+                        FieldValue(field: Field(name: "Completed", type: .boolean), value: .boolean(false)),
+                        FieldValue(field: Field(name: "Progress", type: .number), value: .number(0))
                     ]
         ),
         Project(

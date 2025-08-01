@@ -41,7 +41,7 @@ struct RowBoardView: View {
                         }
                         
                         Button(action: {
-                            //fields.append(Field(name: "New Field", type: .text))
+                            fields.append(Field(name: "New Field", type: .text))
                             showAddFieldSheet = true
                         }) {
                             Image(systemName: "plus.circle")

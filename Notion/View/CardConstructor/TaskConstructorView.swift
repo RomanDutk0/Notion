@@ -135,9 +135,11 @@ struct TaskConstructorView: View {
         switch fieldValue.wrappedValue.value {
         case .text:
             TextField("", text: fieldValue.textBinding)
+                .padding(.horizontal , 10)
                 .multilineTextAlignment(.trailing)
         case .number:
             TextField("", value: fieldValue.numberBinding, formatter: NumberFormatter())
+                .padding(.horizontal , 10)
                 .multilineTextAlignment(.trailing)
         case .selection(let selectionArray):
             Menu {
@@ -149,15 +151,18 @@ struct TaskConstructorView: View {
             } label: {
                 Text(selectionArray.joined(separator: ", "))
                     .foregroundColor(.gray)
-            }
+            } .padding(.horizontal , 10)
         case .date:
             DatePicker("", selection: fieldValue.dateBinding, displayedComponents: [.date])
+                .padding(.horizontal , 10)
                 .labelsHidden()
         case .boolean:
             Toggle("", isOn: fieldValue.booleanBinding)
+                .padding(.horizontal , 10)
                 .labelsHidden()
         case .url:
             TextField("", text: fieldValue.textBinding)
+                .padding(.horizontal , 10)
                 .keyboardType(.URL)
                 .multilineTextAlignment(.trailing)
         }

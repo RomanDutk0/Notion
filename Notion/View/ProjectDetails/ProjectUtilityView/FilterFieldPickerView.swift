@@ -38,59 +38,191 @@ struct FilterFieldPickerView: View {
 
 
                         case .text:
-                            TextField("Enter text", text: Binding(
-                                get: {
-                                    if case .text(let value) = localValues[field.id] {
-                                        return value
-                                    }
-                                    return ""
-                                },
-                                set: { newValue in
-                                    localValues[field.id] = .text(newValue)
+                            let isActive = localValues[field.id] != nil
+                            let textValue: String = {
+                                if case .text(let value) = localValues[field.id] {
+                                    return value
                                 }
-                            ))
+                                return ""
+                            }()
+
+                            Button(action: {
+                                if isActive {
+                                    localValues.removeValue(forKey: field.id)
+                                } else {
+                                    localValues[field.id] = .text("")
+                                }
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Enter text")
+                                            .font(.subheadline)
+                                            .foregroundColor(.primary)
+
+                                        if isActive {
+                                            TextField("Text", text: Binding(
+                                                get: { textValue },
+                                                set: { newValue in
+                                                    localValues[field.id] = .text(newValue)
+                                                }
+                                            ))
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        } else {
+                                            Text("Not applied")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(isActive ? .blue : .gray)
+                                }
+                            }
+
 
                         case .number:
-                            TextField("Enter number", text: Binding(
-                                get: {
-                                    if case .number(let value) = localValues[field.id] {
-                                        return String(value)
-                                    }
-                                    return ""
-                                },
-                                set: { newValue in
-                                    if let number = Double(newValue) {
-                                        localValues[field.id] = .number(number)
-                                    }
+                            let isActive = localValues[field.id] != nil
+                            let numberText: String = {
+                                if case .number(let value) = localValues[field.id] {
+                                    return String(value)
                                 }
-                            ))
-                            .keyboardType(.decimalPad)
+                                return ""
+                            }()
+
+                            Button(action: {
+                                if isActive {
+                                    localValues.removeValue(forKey: field.id)
+                                } else {
+                                    localValues[field.id] = .number(0)
+                                }
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Enter number")
+                                            .font(.subheadline)
+                                            .foregroundColor(.primary)
+
+                                        if isActive {
+                                            TextField("Number", text: Binding(
+                                                get: { numberText },
+                                                set: { newValue in
+                                                    if let number = Double(newValue) {
+                                                        localValues[field.id] = .number(number)
+                                                    }
+                                                }
+                                            ))
+                                            .keyboardType(.decimalPad)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        } else {
+                                            Text("Not applied")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(isActive ? .blue : .gray)
+                                }
+                            }
+
 
                         case .date:
-                            DatePicker("Select date", selection: Binding(
-                                get: {
-                                    if case .date(let date) = localValues[field.id] {
-                                        return date
-                                    }
-                                    return Date()
-                                },
-                                set: { newDate in
-                                    localValues[field.id] = .date(newDate)
+                            let isActive = localValues[field.id] != nil
+                            let dateValue: Date = {
+                                if case .date(let date) = localValues[field.id] {
+                                    return date
                                 }
-                            ), displayedComponents: [.date])
+                                return Date()
+                            }()
+
+                            Button(action: {
+                                if isActive {
+                                    localValues.removeValue(forKey: field.id)
+                                } else {
+                                    localValues[field.id] = .date(Date())
+                                }
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Select date")
+                                            .font(.subheadline)
+                                            .foregroundColor(.primary)
+
+                                        if isActive {
+                                            DatePicker("", selection: Binding(
+                                                get: { dateValue },
+                                                set: { newDate in
+                                                    localValues[field.id] = .date(newDate)
+                                                }
+                                            ), displayedComponents: [.date])
+                                            .labelsHidden()
+                                        } else {
+                                            Text("Not applied")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    if isActive {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.blue)
+                                    } else {
+                                        Image(systemName: "circle")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
 
                         case .boolean:
-                            Toggle("Enabled", isOn: Binding(
-                                get: {
-                                    if case .boolean(let flag) = localValues[field.id] {
-                                        return flag
-                                    }
-                                    return false
-                                },
-                                set: { newValue in
-                                    localValues[field.id] = .boolean(newValue)
+                            let isActive = localValues[field.id] != nil
+                            let boolValue: Bool = {
+                                if case .boolean(let flag) = localValues[field.id] {
+                                    return flag
                                 }
-                            ))
+                                return false
+                            }()
+
+                            Button(action: {
+                                if isActive {
+                                    localValues.removeValue(forKey: field.id)
+                                } else {
+                                    localValues[field.id] = .boolean(false)
+                                }
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Boolean toggle")
+                                            .font(.subheadline)
+                                            .foregroundColor(.primary)
+
+                                        if isActive {
+                                            Toggle("Enabled", isOn: Binding(
+                                                get: { boolValue },
+                                                set: { newValue in
+                                                    localValues[field.id] = .boolean(newValue)
+                                                }
+                                            ))
+                                            .labelsHidden()
+                                        } else {
+                                            Text("Not applied")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(isActive ? .blue : .gray)
+                                }
+                            }
+
 
                         default:
                             Text("Unsupported type")

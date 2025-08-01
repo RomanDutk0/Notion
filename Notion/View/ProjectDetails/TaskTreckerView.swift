@@ -9,25 +9,26 @@ struct TaskTreckerView: View {
     
     @Binding var project: Project
     var fields: [Field]
-    @StateObject var cardModel  = CardViewModel()
+    @StateObject var cardModel = CardViewModel()
+
     @State private var selectedFilter = "All tasks"
-    @State private var selectedFilterImage  = "arrow.right"
-    @State private var hiddenFieldIDs = Set<UUID>()
-    @State private var selectedViewOption =  ViewOption(title: "All tasks", icon: "star", type: .table, groupByFieldName: nil)
-    
+    @State private var selectedFilterImage = "star"
     @State private var searchText = ""
+    
+    @State private var selectedViewOptionIndex = 1
+
     @State private var isSearching = false
     @State private var showAddViewOptionSheet = false
-    @State private var selectedSortField: FieldValue? 
     @State private var showSortMenu = false
-    
     @State private var showFilterMenu = false
-    @State private var filterValues: [UUID: FieldDataValue] = [:]
-   
-   
-   
 
-    
+    private var selectedViewOptionBinding: Binding<ViewOption> {
+        Binding(
+            get: { project.viewOptions[selectedViewOptionIndex] },
+            set: { project.viewOptions[selectedViewOptionIndex] = $0 }
+        )
+    }
+
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 16) {
@@ -39,12 +40,12 @@ struct TaskTreckerView: View {
                     Text("Stay organized with tasks, your way.")
                         .foregroundColor(.gray)
                 }
-                
+
                 HStack {
                     Menu {
-                        ForEach(project.viewOptions) { option in
+                        ForEach(Array(project.viewOptions.enumerated()), id: \.element.id) { index, option in
                             Button {
-                                selectedViewOption = option
+                                selectedViewOptionIndex = index
                                 selectedFilter = option.title
                                 selectedFilterImage = option.icon
                             } label: {
@@ -55,7 +56,7 @@ struct TaskTreckerView: View {
                         Button {
                             showAddViewOptionSheet = true
                         } label: {
-                            Label("Додати перегляд", systemImage: "plus")
+                            Label("Add new view", systemImage: "plus")
                         }
                     } label: {
                         HStack {
@@ -72,10 +73,8 @@ struct TaskTreckerView: View {
                         }
                     }
 
-
-                    
                     Spacer()
-                    
+
                     if isSearching {
                         TextField("Search...", text: $searchText)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -99,7 +98,7 @@ struct TaskTreckerView: View {
                                 .foregroundColor(.black)
                         }
                     }
-                    
+
                     Button {
                         showSortMenu.toggle()
                     } label: {
@@ -109,16 +108,14 @@ struct TaskTreckerView: View {
                     .sheet(isPresented: $showSortMenu) {
                         SortFieldPicker(
                             fields: project.templateOfFieldValues,
-                            selectedSortField: $selectedSortField,
-                            isPresented: $showSortMenu
+                            selectedSortField: selectedViewOptionBinding.selectedSortField,
+                            isPresented: $showSortMenu,
+                            sortDirection: selectedViewOptionBinding.sortDirection
                         )
                         .presentationDetents([.fraction(0.5)])
                     }
-                    
+
                     Button {
-                        for (fieldID, value) in filterValues {
-                            print("ID: \(fieldID) -> Значення: \(value)")
-                        }
                         showFilterMenu.toggle()
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -126,15 +123,15 @@ struct TaskTreckerView: View {
                     }
                     .sheet(isPresented: $showFilterMenu) {
                         FilterFieldPickerView(
-                                fields: fields,
-                                isPresented: $showFilterMenu,
-                                selectedFilterValues: $filterValues
-                                )
+                            fields: fields,
+                            isPresented: $showFilterMenu,
+                            selectedFilterValues: selectedViewOptionBinding.filterValues
+                        )
                         .presentationDetents([.fraction(0.5)])
                     }
-                    
+
                     Button {
-                        cardModel.addTask( to: $project.taskCards ,template: project.templateOfFieldValues)
+                        cardModel.addTask(to: $project.taskCards, template: project.templateOfFieldValues)
                     } label: {
                         Image(systemName: "plus")
                             .padding(12)
@@ -143,47 +140,48 @@ struct TaskTreckerView: View {
                             .cornerRadius(10)
                     }
                 }
-                
-                switch selectedViewOption.type {
+
+                switch selectedViewOptionBinding.wrappedValue.type {
                 case .board:
                     CardBoard(
                         tasks: cardModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: cardModel.createSortClosure(selectedSortField: selectedSortField),
-                            filters: filterValues,
+                            sort: cardModel.createSortClosure(
+                                selectedSortField: selectedViewOptionBinding.selectedSortField.wrappedValue,
+                                direction: selectedViewOptionBinding.sortDirection.wrappedValue
+                            ),
+                            filters: selectedViewOptionBinding.filterValues.wrappedValue,
                             fields: fields
                         ),
-                        selectedViewOption: $selectedViewOption,
+                        selectedViewOption: selectedViewOptionBinding,
                         fields: fields,
-                        hiddenFieldIDs: $hiddenFieldIDs
+                        hiddenFieldIDs: selectedViewOptionBinding.hiddenFieldIDs
                     )
-                    
+
                 case .table:
                     RowBoardView(
                         fields: fields,
                         tasks: cardModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: cardModel.createSortClosure(selectedSortField: selectedSortField),
-                            filters: filterValues,
+                            sort: cardModel.createSortClosure(
+                                selectedSortField: selectedViewOptionBinding.selectedSortField.wrappedValue,
+                                direction: selectedViewOptionBinding.sortDirection.wrappedValue
+                            ),
+                            filters: selectedViewOptionBinding.filterValues.wrappedValue,
                             fields: fields
                         ),
-                        hiddenFieldIDs: $hiddenFieldIDs
+                        hiddenFieldIDs: selectedViewOptionBinding.hiddenFieldIDs
                     )
                 }
             }
             .padding()
             .background(Color.white)
-            
+
             Spacer()
         }
     }
-    
 }
-
-
-
-
 
 
