@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Task: Identifiable  {
+struct Task: Identifiable , Equatable {
     let id = UUID()
     var fieldValues: [FieldValue]
     
@@ -15,4 +15,8 @@ struct Task: Identifiable  {
     func value(for field: Field) -> FieldValue? {
             fieldValues.first { $0.field.id == field.id }
         }
+    
+    static func == (lhs: Task, rhs: Task) -> Bool {
+          return lhs.id == rhs.id
+      }
 }

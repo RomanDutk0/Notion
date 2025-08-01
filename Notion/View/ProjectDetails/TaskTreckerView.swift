@@ -18,12 +18,13 @@ struct TaskTreckerView: View {
     @State private var searchText = ""
     @State private var isSearching = false
     @State private var showAddViewOptionSheet = false
-    @State private var selectedSortField: FieldValue? = nil
+    @State private var selectedSortField: FieldValue? 
     @State private var showSortMenu = false
     
     @State private var showFilterMenu = false
     @State private var filterValues: [UUID: FieldDataValue] = [:]
-    @State private var filterSelectionValues: [UUID: [String]] = [:]
+   
+   
    
 
     
@@ -66,10 +67,12 @@ struct TaskTreckerView: View {
                         .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
                     }
                     .sheet(isPresented: $showAddViewOptionSheet) {
-                        AddViewOptionSheet { newOption in
+                        AddViewOptionSheet(availableFields: project.templateOfFieldValues) { newOption in
                             project.viewOptions.append(newOption)
                         }
                     }
+
+
                     
                     Spacer()
                     
@@ -113,6 +116,9 @@ struct TaskTreckerView: View {
                     }
                     
                     Button {
+                        for (fieldID, value) in filterValues {
+                            print("ID: \(fieldID) -> Значення: \(value)")
+                        }
                         showFilterMenu.toggle()
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -120,13 +126,10 @@ struct TaskTreckerView: View {
                     }
                     .sheet(isPresented: $showFilterMenu) {
                         FilterFieldPickerView(
-                            fields: fields.filter { $0.type == .selection },
-                            selectedFilterValues: $filterSelectionValues,
-                            isPresented: $showFilterMenu
-                        )
-                        .onDisappear {
-                            filterValues = filterSelectionValues.mapValues { .selection($0) }
-                        }
+                                fields: fields,
+                                isPresented: $showFilterMenu,
+                                selectedFilterValues: $filterValues
+                                )
                         .presentationDetents([.fraction(0.5)])
                     }
                     
