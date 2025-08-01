@@ -8,50 +8,51 @@
 import SwiftUI
 
 struct SortFieldPicker: View {
-    
     let fields: [FieldValue]
     @Binding var selectedSortField: FieldValue?
     @Binding var isPresented: Bool
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Sorting by:")
-                .font(.title3.bold())
-                .padding(.bottom, 5)
-                .foregroundColor(.primary)
+    @State private var localSelected: FieldValue?
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(fields, id: \.field.name) { fieldValue in
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    ForEach(fields, id: \.field.id) { fieldValue in
                         Button(action: {
-                            selectedSortField = fieldValue
-                            isPresented = false
-                            print("Sorting by: \(fieldValue.field.name)")
+                            localSelected = fieldValue
                         }) {
                             HStack {
                                 Text(fieldValue.field.name)
-                                    .font(.body)
                                     .foregroundColor(.primary)
                                 Spacer()
-                                if selectedSortField?.field.name == fieldValue.field.name {
-                                    Image(systemName: "checkmark.circle.fill")
+                                if localSelected?.field.id == fieldValue.field.id {
+                                    Image(systemName: "checkmark")
                                         .foregroundColor(.blue)
                                 }
                             }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
+            .navigationTitle("Sorting")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        selectedSortField = localSelected
+                        isPresented = false
+                    }
+                }
+            }
+            .onAppear {
+                localSelected = selectedSortField
+            }
         }
-        .padding()
-        .frame(width: 240, height: 300) 
-        .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(radius: 8)
     }
 }

@@ -1,65 +1,143 @@
 import SwiftUI
 
 struct FilterFieldPickerView: View {
-    
     let fields: [Field]
-    @Binding var selectedFilterValues: [UUID: [String]]
     @Binding var isPresented: Bool
+    @Binding var selectedFilterValues: [UUID: FieldDataValue]
+
+    @State private var localValues: [UUID: FieldDataValue] = [:]
 
     var body: some View {
         NavigationView {
             Form {
                 ForEach(fields) { field in
                     Section(header: Text(field.name)) {
-                        if field.type == .selection, !field.options.isEmpty {
+                        switch field.type {
+                        case .selection:
                             ForEach(field.options, id: \.self) { option in
-                                let isSelected = selectedFilterValues[field.id, default: []].contains(option)
-
+                                let selected = {
+                                    if case let .selection(selections) = localValues[field.id] {
+                                        return selections.contains(option)
+                                    }
+                                    return false
+                                }()
+                                
                                 Button(action: {
-                                    toggleOption(option, for: field.id)
+                                    toggleSelection(option, for: field.id)
                                 }) {
                                     HStack {
                                         Text(option)
                                         Spacer()
-                                        if isSelected {
+                                        if selected {
                                             Image(systemName: "checkmark")
                                                 .foregroundColor(.blue)
                                         }
                                     }
                                 }
                             }
-                        } else {
-                            Text("Тільки селектори підтримуються")
+
+
+                        case .text:
+                            TextField("Enter text", text: Binding(
+                                get: {
+                                    if case .text(let value) = localValues[field.id] {
+                                        return value
+                                    }
+                                    return ""
+                                },
+                                set: { newValue in
+                                    localValues[field.id] = .text(newValue)
+                                }
+                            ))
+
+                        case .number:
+                            TextField("Enter number", text: Binding(
+                                get: {
+                                    if case .number(let value) = localValues[field.id] {
+                                        return String(value)
+                                    }
+                                    return ""
+                                },
+                                set: { newValue in
+                                    if let number = Double(newValue) {
+                                        localValues[field.id] = .number(number)
+                                    }
+                                }
+                            ))
+                            .keyboardType(.decimalPad)
+
+                        case .date:
+                            DatePicker("Select date", selection: Binding(
+                                get: {
+                                    if case .date(let date) = localValues[field.id] {
+                                        return date
+                                    }
+                                    return Date()
+                                },
+                                set: { newDate in
+                                    localValues[field.id] = .date(newDate)
+                                }
+                            ), displayedComponents: [.date])
+
+                        case .boolean:
+                            Toggle("Enabled", isOn: Binding(
+                                get: {
+                                    if case .boolean(let flag) = localValues[field.id] {
+                                        return flag
+                                    }
+                                    return false
+                                },
+                                set: { newValue in
+                                    localValues[field.id] = .boolean(newValue)
+                                }
+                            ))
+
+                        default:
+                            Text("Unsupported type")
                                 .foregroundColor(.gray)
                         }
                     }
                 }
             }
-            .navigationTitle("Фільтри")
+            .navigationTitle("Filters")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Скасувати") {
+                    Button("Cancel") {
                         isPresented = false
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Готово") {
+                    Button("Done") {
+                        selectedFilterValues = localValues
                         isPresented = false
                     }
                 }
             }
+            .onAppear {
+                localValues = selectedFilterValues
+            }
         }
     }
 
-    private func toggleOption(_ option: String, for fieldID: UUID) {
-        if selectedFilterValues[fieldID, default: []].contains(option) {
-            selectedFilterValues[fieldID]?.removeAll(where: { $0 == option })
-            if selectedFilterValues[fieldID]?.isEmpty == true {
-                selectedFilterValues.removeValue(forKey: fieldID)
-            }
+    private func toggleSelection(_ option: String, for fieldID: UUID) {
+        var selections: [String] = []
+        
+        if case let .selection(existing) = localValues[fieldID] {
+            selections = existing
+        }
+        
+        if selections.contains(option) {
+            selections.removeAll { $0 == option }
         } else {
-            selectedFilterValues[fieldID, default: []].append(option)
+            selections.append(option)
+        }
+
+        if selections.isEmpty {
+            localValues.removeValue(forKey: fieldID)
+        } else {
+            localValues[fieldID] = .selection(selections)
         }
     }
+
 }
 

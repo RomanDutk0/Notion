@@ -84,16 +84,19 @@ class CardViewModel: ObservableObject {
         }
     }
 
-    func labeledRow(_ label: String, _ value: String) -> some View {
+    func labeledRow(_ label: String, _ value: String, backgroundColor: Color) -> some View {
         HStack {
             Text(value)
                 .font(.body)
                 .foregroundColor(.primary)
-                .background(Color.gray.opacity(0.1))
+                .padding(8)
+                .background(backgroundColor)
                 .cornerRadius(8)
             Spacer()
         }
     }
+
+
 
     func addFieldToCard(
         name: String,
@@ -188,52 +191,33 @@ class CardViewModel: ObservableObject {
             }
         }
     }
+    
     @ViewBuilder
     func fieldRow(_ fieldValue: FieldValue) -> some View {
+        let name = fieldValue.field.name
+
         switch fieldValue.value {
         case .text(let text):
-            labeledRow(fieldValue.field.name, text)
+            labeledRow(name, text, backgroundColor: .yellow.opacity(0.2))
         case .number(let number):
-            labeledRow(fieldValue.field.name, String(number))
+            labeledRow(name, String(number), backgroundColor: .blue.opacity(0.2))
         case .boolean(let flag):
-            labeledRow(fieldValue.field.name, flag ? "✅" : "❌")
+            labeledRow(name, flag ? "✅" : "❌", backgroundColor: .green.opacity(0.2))
         case .date(let date):
-            labeledRow(fieldValue.field.name, CardViewModel.formatted(date))
+            labeledRow(name, CardViewModel.formatted(date), backgroundColor: .purple.opacity(0.2))
         case .url(let url):
-                URLPreview(urlString: url)
+            URLPreview(urlString: url)
         case .selection(let option):
-            labeledRow(fieldValue.field.name, option.joined(separator: ", "))
+            labeledRow(name, option.joined(separator: ", "), backgroundColor: .orange.opacity(0.2))
         }
     }
+
+
    
     func addTask(to tasks: Binding<[Task]>, template: [FieldValue]) {
         tasks.wrappedValue.append(Task(fieldValues: template))
     }
 
-    
-}
-
-extension FieldDataValue {
-    func matches(_ other: FieldDataValue) -> Bool {
-        switch (self, other) {
-        case let (.text(a), .text(b)):
-            return a.localizedCaseInsensitiveContains(b)
-        case let (.number(a), .number(b)):
-            return a == b
-        case let (.boolean(a), .boolean(b)):
-            return a == b
-        case let (.date(a), .date(b)):
-            return Calendar.current.isDate(a, inSameDayAs: b)
-        case let (.url(a), .url(b)):
-            return a == b
-        case let (.selection(taskValues), .selection(filterValues)):
-            return !Set(taskValues).intersection(filterValues).isEmpty
-        default:
-            return false
-        }
-    }
-    
-    
     
 }
 

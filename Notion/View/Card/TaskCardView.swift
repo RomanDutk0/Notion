@@ -19,8 +19,14 @@ struct TaskCardView: View {
             HStack {
                 Text(cardStatus)
                     .bold()
+                    .padding(8)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                
                 Spacer()
-                Text("\(filteredTasks.count)").opacity(0.5)
+                Text("\(filteredTasks.count)")
+                    .opacity(0.5)
+                  
             }
 
             ForEach(filteredTasks) { task in
@@ -113,4 +119,3 @@ struct KanbanBoardPreview: View {
 #Preview {
     KanbanBoardPreview()
 }
-
