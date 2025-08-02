@@ -8,25 +8,24 @@
 import Foundation
 
 enum ViewType {
-    case board
-    case table
+  case board
+  case table
 }
 
 struct ViewOption: Identifiable {
 
-    let id = UUID()
-    let title: String
-    let icon: String
-    let type: ViewType
-    let groupByFieldName: String?
-    var selectedSortField: FieldValue?
-    var sortDirection: SortDirection = .ascending
-    var filterValues: [UUID: FieldDataValue] = [:]
-    var hiddenFieldIDs = Set<UUID>()
+  let id = UUID()
+  let title: String
+  let icon: String
+  let type: ViewType
+  let groupByFieldName: String?
+  var selectedSortField: FieldValue?
+  var sortDirection: SortDirection = .ascending
+  var filterValues: [UUID: FieldDataValue] = [:]
+  var hiddenFieldIDs = Set<UUID>()
 }
 
 enum SortDirection {
-    case ascending
-    case descending
+  case ascending
+  case descending
 }
-

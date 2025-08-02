@@ -8,7 +8,7 @@
 import Foundation
 
 struct FieldValue: Identifiable {
-    let id = UUID()
-    let field: Field
-    var value: FieldDataValue
+  let id = UUID()
+  let field: Field
+  var value: FieldDataValue
 }
