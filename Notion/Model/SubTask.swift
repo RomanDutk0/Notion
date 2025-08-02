@@ -8,7 +8,7 @@
 import Foundation
 
 struct SubTask: Identifiable {
-    let id = UUID()
-    var title: String
-    var isDone: Bool
+  let id = UUID()
+  var title: String
+  var isDone: Bool
 }
