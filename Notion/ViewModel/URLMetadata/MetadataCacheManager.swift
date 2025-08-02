@@ -8,17 +8,17 @@
 import LinkPresentation
 
 final class MetadataCacheManager {
-    static let shared = MetadataCacheManager()
+  static let shared = MetadataCacheManager()
 
-    private let cache = NSCache<NSString, LPLinkMetadata>()
+  private let cache = NSCache<NSString, LPLinkMetadata>()
 
-    private init() {}
+  private init() {}
 
-    func get(for url: String) -> LPLinkMetadata? {
-        cache.object(forKey: NSString(string: url))
-    }
+  func get(for url: String) -> LPLinkMetadata? {
+    cache.object(forKey: NSString(string: url))
+  }
 
-    func set(_ metadata: LPLinkMetadata, for url: String) {
-        cache.setObject(metadata, forKey: NSString(string: url))
-    }
+  func set(_ metadata: LPLinkMetadata, for url: String) {
+    cache.setObject(metadata, forKey: NSString(string: url))
+  }
 }

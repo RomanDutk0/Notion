@@ -8,8 +8,8 @@
 import Foundation
 
 struct Field: Identifiable {
-    let id = UUID()
-    var name: String
-    var type: FieldType
-    var options: [String] = []
+  let id = UUID()
+  var name: String
+  var type: FieldType
+  var options: [String] = []
 }
