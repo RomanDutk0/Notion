@@ -6,6 +6,7 @@ struct TaskCardView: View {
     
     @ObservedObject var projectModel = ProjectViewModel.getInstance()
     @ObservedObject var cardModel : CardViewModel
+    @ObservedObject var taskListModel :TaskListViewModel
     let cardStatus: String
     var fields: [Field]
     @Binding var allTasks: [Task]
@@ -31,7 +32,7 @@ struct TaskCardView: View {
 
             ForEach(filteredTasks) { task in
                            CardView(
-                            cardModel: cardModel,
+                            cardModel: cardModel, taskListModel: taskListModel,
                                task: Binding(
                                    get: { task },
                                    set: { updated in
@@ -51,7 +52,7 @@ struct TaskCardView: View {
 
             Button {
                 if let template = projectModel.template(forTask: allTasks.first) {
-                    cardModel.addTask( to: $allTasks ,template: template)
+                    taskListModel.addTask( to: $allTasks ,template: template)
                                } else {
                                    print("❌ Could not find template")
                                }

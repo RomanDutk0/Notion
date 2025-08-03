@@ -7,7 +7,6 @@ struct AddPropertyView: View {
     @State private var newFieldType: FieldType = .text
     @State private var newFieldOptions: String = ""
 
-    @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @Binding var showAddFieldSheet: Bool
     
@@ -61,7 +60,7 @@ struct AddPropertyView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        cardModel.addFieldToCard(
+                        FieldFactory.addFieldToCard(
                             name: newFieldName,
                             type: newFieldType,
                             optionsString: newFieldOptions,
@@ -99,10 +98,8 @@ struct AddPropertyView: View {
         ])
 
         var body: some View {
-            let cardModel = CardViewModel(task: $previewTask)
 
             return AddPropertyView(
-                cardModel: cardModel,
                 task: $previewTask,
                 showAddFieldSheet: $showSheet
                  

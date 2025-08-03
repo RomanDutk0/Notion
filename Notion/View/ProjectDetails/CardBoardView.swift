@@ -3,6 +3,7 @@ import SwiftUI
 struct CardBoard: View {
     
     @StateObject var cardModel  = CardViewModel()
+    @StateObject var taskListModel :TaskListViewModel = TaskListViewModel()
     @Binding var tasks: [Task]
     @Binding   var selectedViewOption: ViewOption
     var fields: [Field]
@@ -26,7 +27,7 @@ struct CardBoard: View {
                 ForEach(uniqueStatuses, id: \.self) { status in
                     
                         TaskCardView(
-                            cardModel: cardModel,
+                            cardModel: cardModel, taskListModel: taskListModel,
                             cardStatus: status,
                             fields: fields,
                             allTasks:  $tasks ,

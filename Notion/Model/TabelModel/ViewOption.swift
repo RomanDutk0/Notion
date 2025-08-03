@@ -7,10 +7,6 @@
 
 import Foundation
 
-enum ViewType {
-    case board
-    case table
-}
 
 struct ViewOption: Identifiable {
 
@@ -23,10 +19,5 @@ struct ViewOption: Identifiable {
     var sortDirection: SortDirection = .ascending
     var filterValues: [UUID: FieldDataValue] = [:]
     var hiddenFieldIDs = Set<UUID>()
-}
-
-enum SortDirection {
-    case ascending
-    case descending
 }
 

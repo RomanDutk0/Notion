@@ -3,6 +3,7 @@ import SwiftUI
 struct CardView: View {
     
     @ObservedObject var cardModel : CardViewModel
+    @ObservedObject var taskListModel :TaskListViewModel
     @Binding var task: Task
     @Binding var tasks: [Task]
     @State private var showDetail = false
@@ -15,7 +16,7 @@ struct CardView: View {
         } label: {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(task.fieldValues.filter { !hiddenFieldIDs.contains($0.field.id) }) { fieldValue in
-                    cardModel.fieldRow(fieldValue)
+                    CardFieldRenderer.fieldRow(fieldValue)
                     }
                            
                 
@@ -35,7 +36,7 @@ struct CardView: View {
                 task: $task,
                 hiddenFieldIDs: $hiddenFieldIDs,
                 onDelete: {
-                   cardModel.deleteCard(&tasks, task)
+                   taskListModel.deleteCard(&tasks, task)
                 }
             )
 
@@ -62,9 +63,11 @@ struct CardView: View {
         ]
         @State var hidden: Set<UUID> = []
         @State var cardModel : CardViewModel = CardViewModel()
+        @State var taskListModel :TaskListViewModel = TaskListViewModel()
+        
         var body: some View {
             CardView(
-                cardModel: cardModel,
+                cardModel: cardModel, taskListModel: taskListModel,
                 task: $previewTasks[0],
                 tasks: $previewTasks,
                 hiddenFieldIDs: $hidden

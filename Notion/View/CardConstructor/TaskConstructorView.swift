@@ -5,6 +5,7 @@ struct TaskConstructorView: View {
     @ObservedObject var cardModel : CardViewModel
     @Binding var task: Task
     @State private var comment: String = ""
+    
     @State private var subTasks: [SubTask] = [
         SubTask(title: "To do 1", isDone: true),
         SubTask(title: "To do 2", isDone: true),
@@ -116,7 +117,6 @@ struct TaskConstructorView: View {
             .background(Color(.systemBackground))
             .sheet(isPresented: $showAddFieldSheet) {
                 AddPropertyView(
-                    cardModel: cardModel,
                     task: $task,
                     showAddFieldSheet: $showAddFieldSheet
                 )

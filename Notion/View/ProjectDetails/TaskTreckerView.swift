@@ -10,6 +10,7 @@ struct TaskTreckerView: View {
     @Binding var project: Project
     var fields: [Field]
     @StateObject var cardModel = CardViewModel()
+    @StateObject var taskListModel :TaskListViewModel = TaskListViewModel()
 
     @State private var selectedFilter = "All tasks"
     @State private var selectedFilterImage = "star"
@@ -131,7 +132,7 @@ struct TaskTreckerView: View {
                     }
 
                     Button {
-                        cardModel.addTask(to: $project.taskCards, template: project.templateOfFieldValues)
+                        taskListModel.addTask(to: $project.taskCards, template: project.templateOfFieldValues)
                     } label: {
                         Image(systemName: "plus")
                             .padding(12)
@@ -144,10 +145,10 @@ struct TaskTreckerView: View {
                 switch selectedViewOptionBinding.wrappedValue.type {
                 case .board:
                     CardBoard(
-                        tasks: cardModel.filteredAndSortedTasksBinding(
+                        tasks: taskListModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: cardModel.createSortClosure(
+                            sort: taskListModel.createSortClosure(
                                 selectedSortField: selectedViewOptionBinding.selectedSortField.wrappedValue,
                                 direction: selectedViewOptionBinding.sortDirection.wrappedValue
                             ),
@@ -162,10 +163,10 @@ struct TaskTreckerView: View {
                 case .table:
                     RowBoardView(
                         fields: fields,
-                        tasks: cardModel.filteredAndSortedTasksBinding(
+                        tasks: taskListModel.filteredAndSortedTasksBinding(
                             base: $project.taskCards,
                             searchText: searchText,
-                            sort: cardModel.createSortClosure(
+                            sort: taskListModel.createSortClosure(
                                 selectedSortField: selectedViewOptionBinding.selectedSortField.wrappedValue,
                                 direction: selectedViewOptionBinding.sortDirection.wrappedValue
                             ),

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RowView: View {
     @ObservedObject var cardModel: CardViewModel
+    @ObservedObject var taskListModel :TaskListViewModel
     @Binding var task: Task
     @Binding var tasks: [Task]
     var fields: [Field]
@@ -42,7 +43,7 @@ struct RowView: View {
                 task: $task,
                 hiddenFieldIDs: $hiddenFieldIDs,
                 onDelete: {
-                    cardModel.deleteCard(&tasks, task)
+                    taskListModel.deleteCard(&tasks, task)
                 }
             )
         }
@@ -80,7 +81,7 @@ struct RowView: View {
                 }
 
             default:
-                Text(CardViewModel.stringValue(for: fieldValue.value))
+                Text(FieldFormatter.stringValue(for: fieldValue.value))
                     .lineLimit(1)
                     .foregroundColor(.black)
             }

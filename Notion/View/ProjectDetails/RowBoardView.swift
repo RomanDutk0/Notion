@@ -7,6 +7,7 @@ struct RowBoardView: View {
     @Binding var hiddenFieldIDs: Set<UUID>
     @State private var showAddFieldSheet = false
     @StateObject var cardModel  = CardViewModel()
+    @StateObject var taskListModel :TaskListViewModel = TaskListViewModel()
     
     let columnWidth: CGFloat = 140  
     var body: some View {
@@ -63,7 +64,7 @@ struct RowBoardView: View {
                         LazyVStack(spacing: 0) {
                             ForEach($tasks) { $task in
                                 RowView(
-                                    cardModel : cardModel,
+                                    cardModel : cardModel, taskListModel: taskListModel,
                                     task: $task,
                                     tasks: $tasks,
                                     fields: fields,
